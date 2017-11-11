@@ -5,10 +5,59 @@ Make sure you have git and Node.js >=6.0.0 installed on your pi.
 ```bash
 sudo apt-get update
 sudo apt-get install wiringpi
+sudo npm install forever -g
 git clone https://github.com/CommonGarden/Grow-Hub
 cd Grow-Hub/driver
 npm install
 sudo node Grow-Hub.js
+```
+
+### Run on boot
+```bash
+sudo nano /etc/init.d/grow
+```
+
+Paste in the follow (note this assumes you installed Grow-Hub in the root of the home folder for a user named `pi`):
+
+```bash
+#!/bin/bash
+#/etc/init.d/grow
+export PATH=$PATH:/usr/local/bin
+export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
+
+case "$1" in
+start)
+exec sudo forever --sourceDir=/home/pi/Grow-Hub/driver -p /home/pi/Grow-Hub/dri$
+;;
+stop)
+exec sudo forever stop --sourceDir=/home/pi/Grow-Hub/driver Grow-Hub.js
+;;
+*)
+echo "Usage: /etc/init.d/grow {start|stop}"
+exit 1
+;;
+esac
+exit 0
+```
+
+Make it executable with the following command:
+```bash
+chmod 755 /etc/init.d/grow 
+```
+
+Feel free to test it:
+```bash
+sh /etc/init.d/grow start/stop
+```
+
+If all goes well, make it bootable:
+```bash
+sudo update-rc.d grow defaults
+```
+
+To remove it from boot:
+```bash
+sudo update-rc.d -f myService remove
 ```
 
 # Hardware setup / Bill of materials.
@@ -41,45 +90,3 @@ Oxidation-Reduction Potential (ORP) Probe | 1 | $41.95 | https://www.amazon.com/
 Atlas Scientific ORP Interface Board | 1 | $38 | https://www.atlas-scientific.com/product_pages/circuits/ezo_orp.html
 Atlas Scientific Dissolved Oxygen (DO) Probe | 1 | $198 | https://www.atlas-scientific.com/product_pages/probes/do_probe.html
 Atlas Scientific DO Interface Board | 1 | $44 | https://www.atlas-scientific.com/product_pages/circuits/ezo_do.html
-
-
-# Actuators
-Item             | Quantity | Cost | Link
------------------|----------|------|------------------------------
-12VDC 2A Power Supply | 2 | $3.28 | https://www.aliexpress.com/item/YNL-EU-US-Plug-Power-Adapter-1A-2A-AC-110V-240V-to-DC-12V-for-3528/32815841532.html
-DC Barrel Jack Adapter | 2 | $0.31 | https://www.aliexpress.com/item/10pcs-2-1x5-5mm-female-DC-Power-Jack-Adapter-Plug-Cable-Connector-for-CCTV-CAMERA/719733574.html
-Fermwrap 40W Fermentation Heater | 1 | $23.95 | https://www.amazon.com/dp/B00TP9MLFE/
-Water Pump (circulation) | 1 | $19.99 | https://www.amazon.com/bayite-BYT-7A006-Circulation-Discharge-2-1GPM/dp/B0196WL55G/
-
-# Vessel
-Fermenter:
-![Fermenter](https://user-images.githubusercontent.com/3916616/31311866-302be5d8-ab6a-11e7-9963-6187714b8f64.jpg)
-
-Item             | Quantity | Cost | Link
------------------|----------|------|------------------------------
-Fermonster 7Gal PET Carboy | 1 | $29.99 | https://www.morebeer.com/products/fermonster-7-gallon-carboy.html
-Airlock | 1 | $1.99 | https://www.morebeer.com/products/airlock-3-piece.html
-Thermowell w #10 Stopper | 1 | $13.99 | https://www.amazon.com/gp/product/B01KP4D0K2/
-Stainless Steel Bulkhead | 2 | $9.25 | https://www.amazon.com/Learn-To-Brew-LLC-B00JHM38RE/dp/B00JHM38RE/
-Bazooka Screen | 1 | $8.88 | https://www.amazon.com/Bazooka-Screen-MRbrew-Stainless-Kettle/dp/B07122LN4K/
-3/4" PVC Pipe | 6" | ? | http://www.homedepot.com/p/JM-eagle-3-4-in-x-10-ft-480-PSI-Schedule-40-PVC-Plain-End-Pipe-57471/202280935
-PVC Union - 3/4" FPT/FPT | 1 | $3.85 | http://www.homedepot.com/p/Homewerks-Worldwide-3-4-in-PVC-FPT-x-FPT-Union-511-44-34-34H/204202889
-PVC Union - 1/2" FPT/FPT | 2 | $2.51 | http://www.homedepot.com/p/Homewerks-Worldwide-1-2-in-PVC-FPT-x-FPT-Union-511-44-12-12H/204202887
-PVC Union - 1/2" Slip/Slip | 1 | $2.64 | http://www.homedepot.com/p/Homewerks-Worldwide-1-2-in-PVC-Slip-x-Slip-Union-511-14-12-12H/204202875
-PVC 90 Elbow - 3/4" x 1/2" Slip/Slip | 1 | $0.79 | http://www.homedepot.com/p/DURA-3-4-in-x-1-2-in-Schedule-40-PVC-90-Degree-Reducing-Elbow-C406-101/100345769
-PVC Bushing - 3/4" x 1/2" Slip/FPT | 1 | $0.79 | http://www.homedepot.com/p/DURA-3-4-in-x-1-2-in-Schedule-40-PVC-Reducer-Bushing-C438-101/202101746
-PVC Tee - 3/4" x 3/4" x 1/2" Slip/Slip/FPT | 3 | $0.97 | http://www.homedepot.com/p/DURA-3-4-in-x-3-4-in-x-1-2-in-Schedule-40-PVC-Reducing-Tee-C402-101/100344993
-Probe Fitting | 3 | $2.66 | https://www.amazon.com/gp/product/B00TOOP8AU/
-
-# Feed/Dose Module
-![Doser module](https://user-images.githubusercontent.com/521978/31350657-d8236afe-acdc-11e7-8cbd-e6826b2f679a.jpg)
-
-Item             | Quantity | Cost | Link
------------------|----------|------|------------------------------
-500mL Media Bottle | 1 | $15.01 | https://www.amazon.com/PYREX-500mL-Round-Storage-Bottles/dp/B004XR5TUM
-Peristaltic Pump | 1 | $6.01 | https://www.aliexpress.com/item/12V-DIY-Dosing-Pump-Peristaltic-Dosing-Head-For-Aquarium-Lab-A-Laborator-High-Standard-Lab-Analytical/32820693824.html
-Silicone Tubing - 6mm x 4mm | 4' | $? | ?
-Sanitary Air Filter | 1 | $2.75 | https://www.amazon.com/Sanitary-Filter-Ferroday-Fittings-Homebrew/dp/B07149NMRM/
-Silicone Tubing - 5/16" ID | 3" | ? | ? 
-Acrylic for plastic "cupholder" | 8"x10" | $6 | ?
-

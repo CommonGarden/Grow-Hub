@@ -5,14 +5,44 @@ Make sure you have git and Node.js >=6.0.0 installed on your pi.
 ```bash
 sudo apt-get update
 sudo apt-get install wiringpi
-sudo npm install forever -g
 git clone https://github.com/CommonGarden/Grow-Hub
 cd Grow-Hub/driver
 npm install
 sudo node Grow-Hub.js
 ```
 
+## Connecting to your Grow-IoT instance
+By default, the example driver connects to https://grow.commongarden.org.
+
+To change this see the bottom of the `example-device.js` file. It currently reads.
+
+```
+  growHub.connect({
+    host: 'grow.commongarden.org',
+    port: 443,
+    ssl: true
+  });
+```
+
+For development it's easier to simply connect to you local computer. Find your computer's IP address and change the `host`, `port`, and `ssl` options:
+```
+  growHub.connect({
+    host: '10.0.0.198', // The ip address of the host
+    port: 3000, // The port you are running Grow-IoT on
+    ssl: false
+  });
+```
+
 ### Run on boot
+Once you're happy with your driver you'll want to start it on boot in case your device looses power.
+
+Install [forever](https://www.npmjs.com/package/forever) globally.
+
+```
+sudo npm install forever -g
+```
+
+Then create a new text file in`/etc/init.d/`:
 ```bash
 sudo nano /etc/init.d/grow
 ```
@@ -57,8 +87,21 @@ sudo update-rc.d grow defaults
 
 To remove it from boot:
 ```bash
-sudo update-rc.d -f myService remove
+sudo update-rc.d -f grow remove
 ```
+
+One last step, edit the [/etc/rc.local file](https://www.raspberrypi.org/documentation/linux/usage/rc-local.md).
+
+```
+sudo nano /etc/rc.local
+```
+
+Insert the following line before `exit 0`:
+```
+sh /etc/init.d/grow start
+```
+
+Reboot and your pi should start into the Grow-Hub driver.
 
 # Hardware setup / Bill of materials.
 

@@ -45,10 +45,10 @@ const board = new five.Board({
 // When board emits a 'ready' event run this start function.
 board.on('ready', function start() {
   // Define variables
-  light = new five.Pin('GPIO26');
-  doser = new five.Pin('GPIO21');
-  fan = new five.Pin('GPIO20');
-  heater = new five.Pin('GPIO22');
+  light = new five.Pin('GPIO07');
+  doser = new five.Pin('GPIO03');
+  fan = new five.Pin('GPIO22');
+  heater = new five.Pin('GPIO25');
 
   let GrowHub = new Grow({
     uuid: 'meow',
@@ -59,6 +59,10 @@ board.on('ready', function start() {
       light: 'off',//2
       doser: 'off',//3
       heater: 'off',
+      acid: 'off',
+      base: 'off',
+      nutrient_a: 'off',
+      nutrient_b: 'off',
       duration: 2000,
       interval: 10000,
       threshold: 50,
@@ -153,6 +157,20 @@ board.on('ready', function start() {
       this.doser_off();
       this.fan_off();
       this.heater_off();
+
+      let process = spawn('usbrelay');
+
+      // Find all the relays
+      process.stdout.on('data', (data)=> {
+          let regex = /(.+_.)/;
+          let datalist = data.toString().split('\n');
+          let i = 1;
+          for (let relay of datalist) {
+              let match = relay.match(regex);
+              if (match) this.set('relay' + i, match[1]);
+              i += 1;
+          }
+      });
 
       var interval = this.get('interval');
 
@@ -268,6 +286,62 @@ board.on('ready', function start() {
     fan_off: function () {
       fan.high();
       this.set('fan', 'off');
+    },
+
+    relay1_on: function () {
+        let relay_name = this.get('relay1');
+        this.call('on', relay_name);
+        this.set('acid', 'on');
+    },
+
+    relay1_off: function () {
+        let relay_name = this.get('relay1');
+        this.call('off', relay_name);
+        this.set('acid', 'off');
+    },
+
+    relay2_on: function () {
+        let relay_name = this.get('relay2');
+        this.call('on', relay_name);
+        this.set('base', 'on');
+    },
+
+    relay2_off: function () {
+        let relay_name = this.get('relay2');
+        this.call('off', relay_name);
+        this.set('base', 'off');
+    },
+
+    relay3_on: function () {
+        let relay_name = this.get('relay3');
+        this.call('on', relay_name);
+        this.set('nutrient_a', 'on');
+    },
+
+    relay3_off: function () {
+        let relay_name = this.get('relay3');
+        this.call('off', relay_name);
+        this.set('nutrient_a', 'off');
+    },
+
+    relay4_on: function () {
+        let relay_name = this.get('relay4');
+        this.call('on', relay_name);
+        this.set('nutrient_b', 'on');
+    },
+
+    relay4_off: function () {
+        let relay_name = this.get('relay4');
+        this.call('off', relay_name);
+        this.set('nutrient_b', 'off');
+    },
+
+    on: function(relay) {
+        let process = spawn('usbrelay', [relay + '=1']);
+    },
+
+    off: function(relay) {
+        let process = spawn('usbrelay', [relay + '=0']);
     },
 
     ec_data: function () {

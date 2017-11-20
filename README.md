@@ -21,6 +21,7 @@ Once node.js is working, you're ready for the rest:
 ```bash
 sudo apt-get update
 sudo apt-get install wiringpi
+sudo apt-get install usbrelay
 git clone https://github.com/CommonGarden/Grow-Hub
 cd Grow-Hub/driver
 npm install

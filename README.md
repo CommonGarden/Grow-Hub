@@ -1,6 +1,22 @@
 # Install on Raspberry Pi
 
-Make sure you have git and Node.js >=6.0.0 installed on your pi.
+Install the latest version of Node. Todo this, either search for an article to help walk you through it or run the following:
+
+```
+wget https://nodejs.org/dist/v8.9.1/node-v8.9.1-linux-armv7l.tar.xz
+tar -xvf node-v8.9.1-linux-armv7l.tar.gz 
+cd node-v8.9.1-linux-armv7l
+```
+
+Then copy to /usr/local:
+
+```
+sudo cp -R * /usr/local/
+```
+
+Test that's it's working with `node -v`.
+
+Once node.js is working, you're ready for the rest:
 
 ```bash
 sudo apt-get update

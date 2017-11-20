@@ -48,6 +48,7 @@ board.on('ready', function start() {
   light = new five.Pin('GPIO26');
   doser = new five.Pin('GPIO21');
   fan = new five.Pin('GPIO20');
+  heater = new five.Pin('GPIO22');
 
   let GrowHub = new Grow({
     uuid: 'meow',
@@ -57,12 +58,14 @@ board.on('ready', function start() {
       fan: 'off',//1
       light: 'off',//2
       doser: 'off',//3
-      water_level: null,
+      heater: 'off',
       duration: 2000,
       interval: 10000,
       threshold: 50,
       lux_threshold: 10000,
       currently: null,
+
+      // Hear is an example growfile
       growfile: {
         name: 'Basil',
         version: '0.1.0', // Not grower tested, any recommendations?
@@ -141,47 +144,34 @@ board.on('ready', function start() {
         if (pH) pH_reading = pH;
       });
 
-      // board.i2cRead(0x62, 7, (bytes)=> {
-      //   let orp = Number(this.parseAtlasPH(bytes));
-      //   if (orp) orp_reading = orp;
-      // });
-
-      // board.i2cRead(0x61, 14, (bytes)=> {
-      //   let DO = this.parseAtlasDissolvedOxygen(bytes);
-      //   if (DO) DO_reading = DO;
-      // });
+      board.i2cRead(0x68, 7, (bytes)=> {
+        let temp = Number(this.parseAtlasTemperature(bytes));
+        if (temp) water_temp = temp;
+      });
 
       this.light_off();
       this.doser_off();
       this.fan_off();
+      this.heater_off();
 
       var interval = this.get('interval');
 
       emit_data = setInterval(()=> {
-        let py = spawn('python', ['max31865.py']);
-
-        py.stdout.on('data', (data)=> {
-          console.log("Water temperature: " + data.toString());
-          this.emit('water_temperature', Number(data.toString()));
-        });
-
         this.temp_data();
         this.hum_data();
         this.air_pressure_data();
         this.light_data();
         this.ph_data();
         this.ec_data();
-        // this.orp_data();
-        // this.do_data();
+        this.water_temp_data();
       }, interval);
 
       let growfile = this.get('growfile');
       this.startGrow(growfile);
 
-      let threshold = this.get('threshold');
-
       // Turn the fan on or off. Gee, wouldn't it be nice to do this stuff with a gui?
       this.on('correction', (key, correction)=> {
+        let threshold = this.get('threshold');
         let fan_state = this.get('fan');
         if (correction > threshold) {
           if (fan_state !== 'off') {
@@ -198,7 +188,6 @@ board.on('ready', function start() {
 
       this.on('lux', (value)=> {
         let threshold = Number(this.get('lux_threshold'));
-        console.log(threshold);
         let timeOfDay = this.get('currently');
         if (value <= threshold) {
           if (timeOfDay === 'day') {
@@ -227,11 +216,6 @@ board.on('ready', function start() {
       this.start();
     },
 
-    doser_on: function () {
-      doser.low();
-      this.set('doser', 'on');
-    },
-
     day: function () {
       this.call('light_on');
       this.set('currently', 'day');
@@ -244,9 +228,24 @@ board.on('ready', function start() {
       this.emit('message', 'It is now night.');
     },
 
+    doser_on: function () {
+      doser.low();
+      this.set('doser', 'on');
+    },
+
     doser_off: function () {
       doser.high();
       this.set('doser', 'off');
+    },
+
+    heater_on: function () {
+      heater.low();
+      this.set('heater', 'on');
+    },
+
+    heater_off: function () {
+      heater.high();
+      this.set('heater', 'off');
     },
 
     light_on: function () {
@@ -308,6 +307,8 @@ board.on('ready', function start() {
     },
 
     water_temp_data: function () {
+      board.i2cWrite(0x68, [0x52, 0x00]);
+
       if (!_.isUndefined(water_temp)) {
         this.emit('water_temperature', water_temp);
 
@@ -345,19 +346,21 @@ board.on('ready', function start() {
     }
   });
 
-  setTimeout(()=> {
-    GrowHub.connect({
-      host: '192.168.2.1',
-      port: 8080,
-      // ssl: true
-    });
-  }, 2000);
 
-  // Clean up...
+  // Clean up on exit, make sure everything is off.
   this.on('exit', function() {
     GrowHub.call('light_off');
     GrowHub.call('fan_off');
     GrowHub.call('doser_off');
+    GrowHub.call('heater_off');
     nano.kill();
   });
+
+  setTimeout(()=> {
+    GrowHub.connect({
+      host: 'grow.commongarden.org',
+      port: 443,
+      ssl: true
+    });
+  }, 2000);
 });

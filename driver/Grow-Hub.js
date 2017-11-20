@@ -432,8 +432,8 @@ board.on('ready', function start() {
 
   setTimeout(()=> {
     GrowHub.connect({
-      host: 'grow.commongarden.org',
-      port: 443,
+      host: '10.0.0.6',
+      port: 3000,
       ssl: true
     });
   }, 2000);

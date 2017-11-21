@@ -150,3 +150,112 @@ Oxidation-Reduction Potential (ORP) Probe | 1 | $41.95 | https://www.amazon.com/
 Atlas Scientific ORP Interface Board | 1 | $38 | https://www.atlas-scientific.com/product_pages/circuits/ezo_orp.html
 Atlas Scientific Dissolved Oxygen (DO) Probe | 1 | $198 | https://www.atlas-scientific.com/product_pages/probes/do_probe.html
 Atlas Scientific DO Interface Board | 1 | $44 | https://www.atlas-scientific.com/product_pages/circuits/ezo_do.html
+
+
+### Optional Bluetooth setup
+These instructions come from this [Headless Raspberry Pi configuration over Bluetooth](https://hacks.mozilla.org/2017/02/headless-raspberry-pi-configuration-over-bluetooth/) article. Thanks to Mozilla and Patrick Hundal for providing an excellent resource.
+
+Let’s start by creating the main script that will set up and establish the default Bluetooth services and serial port you will connect to on startup.
+
+You’ll create this file in the root directory, like so:
+
+```
+sudo nano /btserial.sh
+```
+
+Add the following lines to the script:
+
+```
+#!/bin/bash -e
+
+#Edit the display name of the RaspberryPi so you can distinguish
+#your unit from others in the Bluetooth console
+#(very useful in a class setting)
+
+echo PRETTY_HOSTNAME=raspberrypi > /etc/machine-info
+
+# Edit /lib/systemd/system/bluetooth.service to enable BT services
+sudo sed -i: 's|^Exec.*toothd$| \
+ExecStart=/usr/lib/bluetooth/bluetoothd -C \
+ExecStartPost=/usr/bin/sdptool add SP \
+ExecStartPost=/bin/hciconfig hci0 piscan \
+|g' /lib/systemd/system/bluetooth.service
+
+# create /etc/systemd/system/rfcomm.service to enable 
+# the Bluetooth serial port from systemctl
+sudo cat <<EOF | sudo tee /etc/systemd/system/rfcomm.service > /dev/null
+[Unit]
+Description=RFCOMM service
+After=bluetooth.service
+Requires=bluetooth.service
+
+[Service]
+ExecStart=/usr/bin/rfcomm watch hci0 1 getty rfcomm0 115200 vt100 -a pi
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# enable the new rfcomm service
+sudo systemctl enable rfcomm
+
+# start the rfcomm service
+sudo systemctl restart rfcomm
+```
+
+Save the file, and then make it executable by updating its permissions like so:
+
+`chmod 755 /home/pi/btserial.sh`
+
+Now you have the basics of the script required to turn on the Bluetooth service and configure it.  But to do this 100% headless, you’ll need to run this new script on startup. Let’s edit /etc/rc.local to launch this script automatically.
+
+```
+sudo nano /etc/rc.local
+```
+
+Add the following lines after the initial comments:
+
+```
+#Launch bluetooth service startup script /home/pi/btserial.sh
+sudo /btserial.sh &
+```
+
+Save the `rc.local` script.
+
+Now you are ready to go.  Plug in power to the Rpi and give it 30 seconds or so to startup. Then unplug it, and plug it in again and let it boot up a second time.  Restarting the Bluetooth service doesn’t work correctly, so we need to reboot.
+
+Now let’s connect.
+
+### Connecting to your RPi via Bluetooth
+
+On your desktop/laptop, open up your Bluetooth preferences and ensure Bluetooth is enabled.
+
+Select “raspberrypi” (or whatever you have used for PRETTY_HOSTNAME in the btserial.sh script) when it appears and pair with it. It should pair automatically (remember what we said earlier about security issues?)
+
+Open a terminal window on your local machine, and start a screen session to connect via the new Bluetooth serial port created from the RPi connection. First let’s check the name of the serial connection:
+
+```
+ls /dev/cu.*
+```
+
+This should produce a list of available serial ports, one of which should now be named after your pi. Then we can connect.
+
+```
+screen /dev/cu.raspberrypi-SerialPort 115200
+```
+
+Give it a second,  and you should be at the prompt of the RPi console!  Congrats!
+
+
+After you setup a solid wifi connection, it's good to secure the bluetooth configuration. To do so, Let’s edit `/etc/rc.local` to NOT launch the `btserial.sh` script automatically.
+
+```
+sudo nano /etc/rc.local
+```
+
+Comment out the following lines:
+
+```
+#Launch bluetooth service startup script /home/pi/btserial.sh
+#sudo /btserial.sh &
+```

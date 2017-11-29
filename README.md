@@ -63,7 +63,7 @@ Then create a new text file in`/etc/init.d/`:
 sudo nano /etc/init.d/grow
 ```
 
-Paste in the follow (note this assumes you installed Grow-Hub in the root of the home folder for a user named `pi`):
+Paste in the follow (note this assumes you installed Grow-Hub in the `home` folder for a user named `pi`):
 
 ```bash
 #!/bin/bash
@@ -73,7 +73,7 @@ export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 
 case "$1" in
 start)
-exec sudo forever --sourceDir=/home/pi/Grow-Hub/driver -p /home/pi/Grow-Hub/dri$
+exec sudo forever --sourceDir=/home/pi/Grow-Hub/driver -p /home/pi/Grow-Hub/driver Grow-Hub.js
 ;;
 stop)
 exec sudo forever stop --sourceDir=/home/pi/Grow-Hub/driver Grow-Hub.js

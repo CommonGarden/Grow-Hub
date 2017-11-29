@@ -1,4 +1,4 @@
-const Grow = require('Grow.js');
+const Grow = require('./Grow.js');
 const raspio = require('raspi-io');
 const five = require('johnny-five');
 const later = require('later');
@@ -20,7 +20,7 @@ let pH_reading,
   light_data,
   water_temp,
   fan,
-  doser,
+  humidifier,
   light,
   multi,
   level,
@@ -45,19 +45,19 @@ const board = new five.Board({
 // When board emits a 'ready' event run this start function.
 board.on('ready', function start() {
   // Define variables
-  light = new five.Pin('GPIO07');
-  doser = new five.Pin('GPIO03');
-  fan = new five.Pin('GPIO22');
-  heater = new five.Pin('GPIO25');
+  light = new five.Pin('GPIO26');
+  humidifier = new five.Pin('GPIO6');
+  fan = new five.Pin('GPIO4');
+  heater = new five.Pin('GPIO22');
 
   let GrowHub = new Grow({
     uuid: 'meow',
     token: 'meow',
-    component: 'GrowHub',
+    component: 'GrowHubGauges',
     properties: {
       fan: 'off',//1
       light: 'off',//2
-      doser: 'off',//3
+      humidifier: 'off',//3
       heater: 'off',
       acid: 'off',
       base: 'off',
@@ -65,67 +65,79 @@ board.on('ready', function start() {
       nutrient_b: 'off',
       duration: 2000,
       interval: 10000,
-      threshold: 50,
-      lux_threshold: 10000,
       currently: null,
 
       // Hear is an example growfile
       growfile: {
-        name: 'Basil',
-        version: '0.1.0', // Not grower tested, any recommendations?
-        phases: {
-          vegatative: {
-            length: '20 days',
+        name: 'Grow',
+        batch: '#1',
+        temperature_threshold: 50,
+        lux_threshold: 10000,
+        humidity_threshold: 100,
+        ph_threshold: 200,
+        ec_threshold: 200,
+        targets: {
+          water_temperature: {
+            min: 17,
+            max: 28,
+          },
+
+          ph: {
+            min: 5.5,
+            ideal: 6.0,
+            max: 7.0,
+            pid: {
+              k_p: 200,
+              k_i: 0,
+              k_d: 100,
+              dt: 1
+            }
+          },
+
+          ec: {
+            min: 200,
+            ideal: 800,
+            max: 1500,
+            pid: {
+              k_p: 200,
+              k_i: 0,
+              k_d: 100,
+              dt: 1
+            }
+          }
+        },
+        cycles: {
+          day: {
             targets: {
-              water_temperature: {
+              temperature: {
                 min: 17,
+                ideal: 24,
                 max: 28,
-              },
-
-              ph: {
-                min: 5.5,
-                max: 7.0,
-              },
-
-              ec: {
-                min: 200,
-                max: 1500
+                pid: {
+                  k_p: 200,
+                  k_i: 0,
+                  k_d: 100,
+                  dt: 1
+                }
               }
             },
-            cycles: {
-              day: {
-                targets: {
-                  temperature: {
-                    min: 17,
-                    ideal: 24,
-                    max: 28,
-                    pid: {
-                      k_p: 200,
-                      k_i: 0,
-                      k_d: 100,
-                      dt: 1
-                    }
-                  }
-                },
-                schedule: 'after 8:00am'
-              },
-              night: {
-                targets: {
-                  temperature: {
-                    min: 12,
-                    ideal: 20,
-                    max: 26,
-                    pid: {
-                      k_p: 200,
-                      k_i: 0,
-                      k_d: 100,
-                      dt: 1
-                    }
-                  }
-                },
-                schedule: 'after 7:00pm'
+            schedule: 'after 8:00am'
+          },
+          night: {
+            targets: {
+              temperature: {
+                min: 12,
+                ideal: 20,
+                max: 26,
+                pid: {
+                  k_p: 200,
+                  k_i: 0,
+                  k_d: 100,
+                  dt: 1
+                }
               }
-            }
+            },
+            schedule: 'after 7:00pm'
           }
         }
       }
@@ -139,24 +151,19 @@ board.on('ready', function start() {
       board.i2cConfig();
 
       board.i2cRead(0x64, 32, (bytes)=> {
-        let eC = this.parseAtlasTDS(bytes);
+        let eC = Number(this.parseAsciiResponse(bytes));
         if (eC) eC_reading = eC;
       });
 
       board.i2cRead(0x63, 7, (bytes)=> {
-        let pH = this.parseAtlasPH(bytes);
+        let pH = Number(this.parseAsciiResponse(bytes));
         if (pH) pH_reading = pH;
       });
 
-      board.i2cRead(0x68, 7, (bytes)=> {
-        let temp = Number(this.parseAtlasTemperature(bytes));
+      board.i2cRead(0x66, 7, (bytes)=> {
+        let temp = Number(this.parseAsciiResponse(bytes));
         if (temp) water_temp = temp;
       });
-
-      this.light_off();
-      this.doser_off();
-      this.fan_off();
-      this.heater_off();
 
       let process = spawn('usbrelay');
 
@@ -171,6 +178,11 @@ board.on('ready', function start() {
               i += 1;
           }
       });
+
+      this.light_off();
+      this.humidifier_off();
+      this.fan_off();
+      this.heater_off();
 
       var interval = this.get('interval');
 
@@ -189,23 +201,67 @@ board.on('ready', function start() {
 
       // Turn the fan on or off. Gee, wouldn't it be nice to do this stuff with a gui?
       this.on('correction', (key, correction)=> {
-        let threshold = this.get('threshold');
+        console.log('Key: ' + key + '  Correction: ' + correction);
+        let temp_threshold = growfile.temperature_threshold;
+        let hum_threshold = growfile.humidity_threshold;
         let fan_state = this.get('fan');
-        if (correction > threshold) {
-          if (fan_state !== 'off') {
-            this.call('fan_off');
-            this.emit('message', 'Too cold, fan off.');
+        if (key === 'temperature' || key ==='water_temperature') {
+          if (correction > temp_threshold) {
+            if (fan_state !== 'off') {
+              this.call('fan_off');
+              this.call('heater_on');
+              this.emit('message', 'Too cold, heater on, fan off.');
+            }
+          } else {
+            if (fan_state === 'off') {
+              this.call('fan_on');
+              this.call('heater_off');
+              this.emit('message', 'Too warm, fan on, heater_off.');
+            }
           }
-        } else {
-          if (fan_state === 'off') {
-            this.call('fan_on');
-            this.emit('message', 'Too warm, fan on.')
+        }
+
+        if (key === 'humidity') {
+          if (correction > hum_threshold) {
+            if (fan_state !== 'off') {
+              this.call('fan_off');
+              this.call('heater_on');
+              this.emit('message', 'Too cold, heater on, fan off.');
+            }
+          } else {
+            if (fan_state === 'off') {
+              this.call('fan_on');
+              this.call('heater_off');
+              this.emit('message', 'Too warm, fan on, heater_off.');
+            }
+          }
+        }
+
+        let ph_threshold = growfile.ph_threshold;
+        let ec_threshold = growfile.ec_threshold;
+        if (key === 'ph') {
+          if (correction > ph_threshold) {
+            this.call('acid');
+            this.emit('message', 'Acid pump on.');
+          } else {
+            this.call('base');
+            this.emit('message', 'Base pump on.');
+          }
+        }
+  
+
+        if (key === 'ec') {
+          if (correction > ec_threshold) {
+            this.call('nutrient_a', correction);
+            this.call('nutrient_b', correction);
+          } else {
+            this.emit('alert', 'Nutrient contents high!') 
           }
         }
       });
 
       this.on('lux', (value)=> {
-        let threshold = Number(this.get('lux_threshold'));
+        let threshold = Number(growfile.lux_threshold);
         let timeOfDay = this.get('currently');
         if (value <= threshold) {
           if (timeOfDay === 'day') {
@@ -217,6 +273,8 @@ board.on('ready', function start() {
           this.emit('message', 'Sufficient light, saving energy.')
         }
       });
+
+      // console.log(this);
 
       this.emit('message', 'Running')
     },
@@ -246,76 +304,112 @@ board.on('ready', function start() {
       this.emit('message', 'It is now night.');
     },
 
-    doser_on: function () {
-      doser.low();
-      this.set('doser', 'on');
+    humidifier_on: function () {
+      humidifier.high();
+      this.set('humidifier', 'on');
     },
 
-    doser_off: function () {
-      doser.high();
-      this.set('doser', 'off');
+    humidifier_off: function () {
+      humidifier.low();
+      this.set('humidifier', 'off');
     },
 
     heater_on: function () {
-      heater.low();
+      heater.high();
       this.set('heater', 'on');
     },
 
     heater_off: function () {
-      heater.high();
+      heater.low();
       this.set('heater', 'off');
     },
 
     light_on: function () {
-      light.low();
+      light.high();
       console.log("light on")
       this.set('light', 'on');
     },
 
     light_off: function () {
-      light.high();
+      light.low();
       console.log("light off")
       this.set('light', 'off');
     },
 
     fan_on: function () {
-      fan.low();
+      fan.high();
       this.set('fan', 'on');
     },
 
     fan_off: function () {
-      fan.high();
+      fan.low();
       this.set('fan', 'off');
     },
 
+    acid: function (duration) {
+      this.call('relay1_on');
+          this.set('acid', 'on');
+      setTimeout(()=> {
+        this.call('relay1_off');
+        this.set('acid', 'off');
+      }, duration ? duration: 1000);
+    },
+
+    base: function (duration) {
+      this.call('relay2_on');
+          this.set('base', 'on');
+      setTimeout(()=> {
+        this.call('relay2_off');
+        this.set('base', 'off');
+      }, duration ? duration: 1000);
+    },
+
+    nutrient_a: function (duration) {
+      this.call('relay3_on');
+          this.set('nutrient_a', 'on');
+      setTimeout(()=> {
+        this.call('relay3_off');
+            this.set('nutrient_a', 'off');
+      }, duration ? duration: 1000);
+    },
+
+    nutrient_b: function (duration) {
+      this.call('relay4_on');
+          this.set('nutrient_b', 'on');
+      setTimeout(()=> {
+        this.call('relay4_off');
+            this.set('nutrient_b', 'off');
+      }, duration ? duration: 1000);
+    },
+
     relay1_on: function () {
-        let relay_name = this.get('relay1');
-        this.call('on', relay_name);
-        this.set('acid', 'on');
+      let relay_name = this.get('relay1');
+      this.call('on', relay_name);
+      this.set('acid', 'on');
     },
 
     relay1_off: function () {
-        let relay_name = this.get('relay1');
-        this.call('off', relay_name);
-        this.set('acid', 'off');
+      let relay_name = this.get('relay1');
+      this.call('off', relay_name);
+      this.set('acid', 'off');
     },
 
     relay2_on: function () {
-        let relay_name = this.get('relay2');
-        this.call('on', relay_name);
-        this.set('base', 'on');
+      let relay_name = this.get('relay2');
+      this.call('on', relay_name);
+      this.set('base', 'on');
     },
 
     relay2_off: function () {
-        let relay_name = this.get('relay2');
-        this.call('off', relay_name);
-        this.set('base', 'off');
+      let relay_name = this.get('relay2');
+      this.call('off', relay_name);
+      this.set('base', 'off');
     },
 
     relay3_on: function () {
-        let relay_name = this.get('relay3');
-        this.call('on', relay_name);
-        this.set('nutrient_a', 'on');
+      let relay_name = this.get('relay3');
+      this.call('on', relay_name);
+      this.set('nutrient_a', 'on');
     },
 
     relay3_off: function () {
@@ -337,10 +431,12 @@ board.on('ready', function start() {
     },
 
     on: function(relay) {
+        console.log(relay);
         let process = spawn('usbrelay', [relay + '=1']);
     },
 
     off: function(relay) {
+        console.log(relay);
         let process = spawn('usbrelay', [relay + '=0']);
     },
 
@@ -353,15 +449,6 @@ board.on('ready', function start() {
       console.log('Conductivity: ' + eC_reading);
     },
 
-    orp_data: function () {
-      // Request a reading
-      board.i2cWrite(0x62, [0x52, 0x00]);
-
-      this.emit('orp', orp_reading);
-
-      console.log('ORP: ' + orp_reading);
-    },
-
     ph_data: function () {
       // Request a reading
       board.i2cWrite(0x63, [0x52, 0x00]);
@@ -371,17 +458,8 @@ board.on('ready', function start() {
       console.log('ph: ' + pH_reading);
     },
 
-    do_data: function () {
-      // Request a reading
-      board.i2cWrite(0x61, [0x52, 0x00]);
-
-      this.emit('dissolved_oxygen', DO_reading);
-
-      console.log('Dissolved oxygen: ' + DO_reading);
-    },
-
     water_temp_data: function () {
-      board.i2cWrite(0x68, [0x52, 0x00]);
+      board.i2cWrite(0x66, [0x52, 0x00]);
 
       if (!_.isUndefined(water_temp)) {
         this.emit('water_temperature', water_temp);
@@ -420,20 +498,23 @@ board.on('ready', function start() {
     }
   });
 
-
   // Clean up on exit, make sure everything is off.
   this.on('exit', function() {
     GrowHub.call('light_off');
     GrowHub.call('fan_off');
-    GrowHub.call('doser_off');
+    GrowHub.call('humidifier_off');
     GrowHub.call('heater_off');
+    GrowHub.call('relay1_off');
+    GrowHub.call('relay2_off');
+    GrowHub.call('relay3_off');
+    GrowHub.call('relay4_off');
     nano.kill();
   });
 
   setTimeout(()=> {
     GrowHub.connect({
-      host: '10.0.0.6',
-      port: 3000,
+      host: 'grow.commongarden.org',
+      port: 443,
       ssl: true
     });
   }, 2000);

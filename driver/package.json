@@ -1,6 +1,6 @@
 {
-  "name": "CG-Bioreactor",
-  "version": "0.3.0",
+  "name": "CG-Grow-Hub",
+  "version": "0.4.0",
   "description": "",
   "main": "Grow-Hub.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "author": "Common Garden",
   "license": "MIT",
   "dependencies": {
-    "Grow.js": "^0.4.0",
+    "Grow.js": "^0.4.1",
     "johnny-five": "^0.11.7",
     "later": "^1.2.0",
     "raspi-io": "^8.1.0",

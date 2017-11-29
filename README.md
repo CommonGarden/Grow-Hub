@@ -4,11 +4,11 @@ Install the latest version of Node. Todo this, either search for an article to h
 
 ```
 wget https://nodejs.org/dist/v8.9.1/node-v8.9.1-linux-armv7l.tar.xz
-tar -xvf node-v8.9.1-linux-armv7l.tar.gz 
+tar -xvf node-v8.9.1-linux-armv7l.tar.xz
 cd node-v8.9.1-linux-armv7l
 ```
 
-Then copy to /usr/local:
+Then copy to `/usr/local`:
 
 ```
 sudo cp -R * /usr/local/
@@ -20,8 +20,7 @@ Once node.js is working, you're ready for the rest:
 
 ```bash
 sudo apt-get update
-sudo apt-get install wiringpi
-sudo apt-get install usbrelay
+sudo apt-get install wiringpi usbrelay git i2c-tools
 git clone https://github.com/CommonGarden/Grow-Hub
 cd Grow-Hub/driver
 npm install

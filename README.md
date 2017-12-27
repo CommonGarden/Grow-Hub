@@ -73,7 +73,7 @@ export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 
 case "$1" in
 start)
-exec sudo forever -l logs.log --sourceDir=/home/pi/Grow-Hub/driver -p /home/pi/Grow-Hub/driver Grow-Hub.js
+exec sudo forever -e grow-errors.log --sourceDir=/home/pi/Grow-Hub/driver -p /home/pi/Grow-Hub/driver Grow-Hub.js
 ;;
 stop)
 exec sudo forever stop --sourceDir=/home/pi/Grow-Hub/driver Grow-Hub.js

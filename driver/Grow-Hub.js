@@ -76,6 +76,8 @@ board.on('ready', function start() {
         humidity_threshold: 100,
         ph_threshold: 200,
         ec_threshold: 200,
+        // Ratio for nutrients.
+        nutrient_a_b_ratio: 0.5,
         targets: {
           water_temperature: {
             min: 17,
@@ -200,7 +202,7 @@ board.on('ready', function start() {
       this.startGrow(growfile);
 
       // Turn the fan on or off. Gee, wouldn't it be nice to do this stuff with a gui?
-      this.on('correction', (key, correction)=> {
+      this.addListener('correction', (key, correction)=> {
         console.log('Key: ' + key + '  Correction: ' + correction);
         let temp_threshold = growfile.temperature_threshold;
         let hum_threshold = growfile.humidity_threshold;
@@ -240,7 +242,7 @@ board.on('ready', function start() {
         let ph_threshold = growfile.ph_threshold;
         let ec_threshold = growfile.ec_threshold;
         if (key === 'ph') {
-          if (correction > ph_threshold) {
+          if (correction < ph_threshold) {
             this.call('acid');
             this.emit('message', 'Acid pump on.');
           } else {
@@ -252,6 +254,7 @@ board.on('ready', function start() {
 
         if (key === 'ec') {
           if (correction > ec_threshold) {
+            // TODO: need some sort of ratio argument.
             this.call('nutrient_a', correction);
             this.call('nutrient_b', correction);
           } else {
@@ -260,7 +263,7 @@ board.on('ready', function start() {
         }
       });
 
-      this.on('lux', (value)=> {
+      this.addListener('lux', (value)=> {
         let threshold = Number(growfile.lux_threshold);
         let timeOfDay = this.get('currently');
         if (value <= threshold) {
@@ -338,48 +341,62 @@ board.on('ready', function start() {
 
     fan_on: function () {
       fan.high();
+      console.log("fan on")
       this.set('fan', 'on');
     },
 
     fan_off: function () {
       fan.low();
+      console.log("fan off")
       this.set('fan', 'off');
     },
 
     acid: function (duration) {
-      this.call('relay1_on');
-          this.set('acid', 'on');
-      setTimeout(()=> {
-        this.call('relay1_off');
-        this.set('acid', 'off');
-      }, duration ? duration: 1000);
+      if (duration) {
+        this.call('relay1_on');
+        this.set('acid', 'on');
+        setTimeout(()=> {
+          this.call('relay1_off');
+          this.set('acid', 'off');
+          this.relay1_off();
+        }, duration);
+      }
     },
 
     base: function (duration) {
-      this.call('relay2_on');
-          this.set('base', 'on');
-      setTimeout(()=> {
-        this.call('relay2_off');
-        this.set('base', 'off');
-      }, duration ? duration: 1000);
+      if (duration) {
+        this.call('relay2_on');
+        this.set('base', 'on');
+        setTimeout(()=> {
+          this.call('relay2_off');
+          this.set('base', 'off');
+          this.relay2_off();
+        }, duration);
+      }
     },
 
     nutrient_a: function (duration) {
-      this.call('relay3_on');
-          this.set('nutrient_a', 'on');
-      setTimeout(()=> {
-        this.call('relay3_off');
-            this.set('nutrient_a', 'off');
-      }, duration ? duration: 1000);
+      if (duration) {
+        this.call('relay3_on');
+        this.set('nutrient_a', 'on');
+        setTimeout(()=> {
+          this.call('relay3_off');
+          this.set('nutrient_a', 'off');
+          this.relay3_off();
+        }, duration);
+      }
     },
 
     nutrient_b: function (duration) {
-      this.call('relay4_on');
-          this.set('nutrient_b', 'on');
-      setTimeout(()=> {
-        this.call('relay4_off');
-            this.set('nutrient_b', 'off');
-      }, duration ? duration: 1000);
+      if (duration) {
+        this.call('relay4_on');
+        this.set('nutrient_b', 'on');
+        setTimeout(()=> {
+          this.call('relay4_off');
+          this.set('nutrient_b', 'off');
+          this.relay4_off();
+        }, duration);
+      }
     },
 
     relay1_on: function () {
@@ -496,7 +513,7 @@ board.on('ready', function start() {
         console.log('Humidity: ' + currentHumidity);
       }
     }
-  });
+  }, 'data.json');
 
   // Clean up on exit, make sure everything is off.
   this.on('exit', function() {

@@ -1,4 +1,4 @@
-const Grow = require('./Grow.js');
+const Grow = require('Grow.js');
 const raspio = require('raspi-io');
 const five = require('johnny-five');
 const later = require('later');
@@ -64,7 +64,7 @@ board.on('ready', function start() {
       nutrient_a: 'off',
       nutrient_b: 'off',
       duration: 2000,
-      interval: 10000,
+      interval: 100000,
       currently: null,
 
       // Hear is an example growfile

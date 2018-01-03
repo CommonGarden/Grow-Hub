@@ -119,6 +119,9 @@ sh /etc/init.d/grow start
 
 Reboot and your pi should start into the Grow-Hub driver.
 
+#### Checking logs
+To check the logs, ssh into the raspberry pi and see the `out.log` and `error.log` files in the home directory. An additional `forever.log` file can be found in the `driver/` folder. See [forever](https://www.npmjs.com/package/forever) documentation for more info.
+
 # Hardware setup / Bill of materials.
 
 # Control Box

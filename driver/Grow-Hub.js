@@ -1,3 +1,6 @@
+const uuid = 'PUT_YOUR_UUID_HERE';
+const token = 'PUT_YOUR_TOKEN_HERE';
+
 const Grow = require('Grow.js');
 const raspio = require('raspi-io');
 const five = require('johnny-five');
@@ -51,8 +54,8 @@ board.on('ready', function start() {
   heater = new five.Pin('GPIO22');
 
   let GrowHub = new Grow({
-    uuid: 'meow',
-    token: 'meow',
+    uuid: uuid,
+    token: token,
     component: 'GrowHubGauges',
     properties: {
       fan: 'off',//1
@@ -101,9 +104,9 @@ board.on('ready', function start() {
             ideal: 800,
             max: 1500,
             pid: {
-              k_p: 200,
+              k_p: 20,
               k_i: 0,
-              k_d: 100,
+              k_d: 10,
               dt: 1
             }
           }
@@ -243,20 +246,19 @@ board.on('ready', function start() {
         let ec_threshold = growfile.ec_threshold;
         if (key === 'ph') {
           if (correction < ph_threshold) {
-            this.call('acid');
+            this.call('acid', correction);
             this.emit('message', 'Acid pump on.');
           } else {
-            this.call('base');
+            this.call('base', correction);
             this.emit('message', 'Base pump on.');
           }
         }
-  
 
+        let nutrient_a_b_ratio = growfile.nutrient_a_b_ratio;
         if (key === 'ec') {
           if (correction > ec_threshold) {
-            // TODO: need some sort of ratio argument.
-            this.call('nutrient_a', correction);
-            this.call('nutrient_b', correction);
+            this.call('nutrient_a', correction * nutrient_a_b_ratio);
+            this.call('nutrient_b', correction / nutrient_a_b_ratio);
           } else {
             this.emit('alert', 'Nutrient contents high!') 
           }

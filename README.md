@@ -88,7 +88,7 @@ exit 0
 
 Make it executable with the following command:
 ```bash
-chmod 755 /etc/init.d/grow 
+sudo chmod 755 /etc/init.d/grow 
 ```
 
 Feel free to test it:

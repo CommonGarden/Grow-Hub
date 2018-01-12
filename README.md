@@ -93,6 +93,11 @@ sudo chmod 755 /etc/init.d/grow
 
 Feel free to test it:
 ```bash
+sh /etc/init.d/grow start
+```
+
+To stop it:
+```bash
 sh /etc/init.d/grow start/stop
 ```
 

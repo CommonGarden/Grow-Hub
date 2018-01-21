@@ -60,6 +60,12 @@ board.on('ready', function start() {
       duration: 2000,
       interval: 100000,
       currently: null,
+      outlet_mapping: {
+          relay_1: 'heater',
+          relay_2: 'fan',
+          relay_3: 'humidifier',
+          relay_4: 'light'
+      },
 
       // Hear is an example growfile
       growfile: {
@@ -179,6 +185,7 @@ board.on('ready', function start() {
         this.light_data();
         this.ph_data();
         this.ec_data();
+        this.co2_data();
         this.water_temp_data();
       }, interval);
 

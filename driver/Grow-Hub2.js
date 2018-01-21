@@ -20,6 +20,7 @@ let pH_reading,
   DO_reading,
   orp_reading,
   emit_data,
+  co2,
   light_data,
   water_temp,
   fan,
@@ -388,7 +389,18 @@ board.on('ready', function start() {
     },
 
     co2_data: function () {
-        console.log('todo');
+        let process = spawn('python', ['co2.py']);
+
+        process.stdout.on('data', (data)=> {
+            co2 = data;
+        });
+
+        if (!_.isUndefined(co2)) {
+            this.emit('co2', co2);
+
+            console.log('CO2 ppm: ' + co2);
+        }
+
     },
 
     light_data: function () {

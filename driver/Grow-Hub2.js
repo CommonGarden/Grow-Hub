@@ -357,7 +357,7 @@ board.on('ready', function start() {
     },
 
     ec_data: function () {
-      // Request a reading, 
+      // Request a reading
       board.i2cWrite(0x64, [0x52, 0x00]);
 
       this.emit('ec', eC_reading);
@@ -448,9 +448,9 @@ board.on('ready', function start() {
 
   setTimeout(()=> {
     GrowHub.connect({
-      host: 'grow.commongarden.org',
-      port: 443,
-      ssl: true
+      host: '10.0.0.26',
+      port: 3000,
+      // ssl: true
     });
   }, 2000);
 });

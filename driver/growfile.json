@@ -1,0 +1,72 @@
+{
+  "name": "Grow",
+  "batch": "#1",
+  "temperature_threshold": 50,
+  "lux_threshold": 10000,
+  "humidity_threshold": 100,
+  "ph_threshold": 200,
+  "ec_threshold": 200,
+  "nutrient_a_b_ratio": 0.5,
+  "targets": {
+    "water_temperature": {
+      "min": 17,
+      "max": 28
+    },
+    "ph": {
+      "min": 5.5,
+      "ideal": 6,
+      "max": 7,
+      "pid": {
+        "k_p": 200,
+        "k_i": 0,
+        "k_d": 100,
+        "dt": 1
+      }
+    },
+    "ec": {
+      "min": 200,
+      "ideal": 800,
+      "max": 1500,
+      "pid": {
+        "k_p": 20,
+        "k_i": 0,
+        "k_d": 10,
+        "dt": 1
+      }
+    }
+  },
+  "cycles": {
+    "day": {
+      "targets": {
+        "temperature": {
+          "min": 17,
+          "ideal": 24,
+          "max": 28,
+          "pid": {
+            "k_p": 200,
+            "k_i": 0,
+            "k_d": 100,
+            "dt": 1
+          }
+        }
+      },
+      "schedule": "after 8:00am"
+    },
+    "night": {
+      "targets": {
+        "temperature": {
+          "min": 12,
+          "ideal": 20,
+          "max": 26,
+          "pid": {
+            "k_p": 200,
+            "k_i": 0,
+            "k_d": 100,
+            "dt": 1
+          }
+        }
+      },
+      "schedule": "after 7:00pm"
+    }
+  }
+}

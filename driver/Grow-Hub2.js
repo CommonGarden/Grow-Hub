@@ -1,5 +1,5 @@
-const uuid = 'PUT_YOUR_UUID_HERE';
-const token = 'PUT_YOUR_TOKEN_HERE';
+const uuid = 'greenmeow';
+const token = 'greenmeow';
 
 const Grow = require('Grow.js');
 const raspio = require('raspi-io');
@@ -7,6 +7,8 @@ const five = require('johnny-five');
 const later = require('later');
 const _ = require('underscore');
 const spawn = require('child_process').spawn;
+const growfile_example = require('./growfile.json');
+const types = require('./types.js');
 
 // Use local time, not UTC.
 later.date.localTime();
@@ -21,6 +23,8 @@ let pH_reading,
   orp_reading,
   emit_data,
   co2,
+  moist_one,
+  moist_two,
   light_data,
   water_temp,
   fan,
@@ -39,6 +43,9 @@ nano.stdout.on('data', (data)=> {
   currentHumidity = parsedData[2];
   pressure = parsedData[4];
   light_data = parsedData[5];
+  co2 = parsedData[6];
+  moist_one = parsedData[7];
+  moist_two = parsedData[8];
 });
 
 // Create a new board object
@@ -51,98 +58,17 @@ board.on('ready', function start() {
   let GrowHub = new Grow({
     uuid: uuid,
     token: token,
-    component: 'GrowHubGauges',
+    component: 'NewHub',
     properties: {
-      fan: 'off',//1
-      light: 'off',//2
-      humidifier: 'off',//3
+      fan: 'off',
       heater: 'off',
+      humidifier: 'off',
+      light: 'off',
       duration: 2000,
-      interval: 100000,
+      interval: 10000,
       currently: null,
-      outlet_mapping: {
-          relay_1: 'heater',
-          relay_2: 'fan',
-          relay_3: 'humidifier',
-          relay_4: 'light'
-      },
-
-      // Hear is an example growfile
-      growfile: {
-        name: 'Grow',
-        batch: '#1',
-        temperature_threshold: 50,
-        lux_threshold: 10000,
-        humidity_threshold: 100,
-        ph_threshold: 200,
-        ec_threshold: 200,
-        // Ratio for nutrients.
-        nutrient_a_b_ratio: 0.5,
-        targets: {
-          water_temperature: {
-            min: 17,
-            max: 28,
-          },
-
-          ph: {
-            min: 5.5,
-            ideal: 6.0,
-            max: 7.0,
-            pid: {
-              k_p: 200,
-              k_i: 0,
-              k_d: 100,
-              dt: 1
-            }
-          },
-
-          ec: {
-            min: 200,
-            ideal: 800,
-            max: 1500,
-            pid: {
-              k_p: 20,
-              k_i: 0,
-              k_d: 10,
-              dt: 1
-            }
-          }
-        },
-        cycles: {
-          day: {
-            targets: {
-              temperature: {
-                min: 17,
-                ideal: 24,
-                max: 28,
-                pid: {
-                  k_p: 200,
-                  k_i: 0,
-                  k_d: 100,
-                  dt: 1
-                }
-              }
-            },
-            schedule: 'after 8:00am'
-          },
-          night: {
-            targets: {
-              temperature: {
-                min: 12,
-                ideal: 20,
-                max: 26,
-                pid: {
-                  k_p: 200,
-                  k_i: 0,
-                  k_d: 100,
-                  dt: 1
-                }
-              }
-            },
-            schedule: 'after 7:00pm'
-          }
-        }
-      }
+      types: types,
+      growfile: growfile_example
     },
 
     start: function () {
@@ -153,8 +79,14 @@ board.on('ready', function start() {
       board.i2cConfig();
 
       board.i2cRead(0x64, 32, (bytes)=> {
-        let eC = Number(this.parseAsciiResponse(bytes));
-        if (eC) eC_reading = eC;
+          // console.log(bytes);
+          let eC = this.parseAsciiResponse(bytes);
+          // console.log(eC);
+          if (eC) {
+              let regex = /(\d.\.?\d.),/;
+              eC_reading = eC.match(regex)[1];
+              console.log(eC_reading);
+          }
       });
 
       board.i2cRead(0x63, 7, (bytes)=> {
@@ -177,16 +109,9 @@ board.on('ready', function start() {
       });
 
       var interval = this.get('interval');
-
-      emit_data = setInterval(()=> {
-        this.temp_data();
-        this.hum_data();
-        this.air_pressure_data();
-        this.light_data();
-        this.ph_data();
-        this.ec_data();
-        this.co2_data();
-        this.water_temp_data();
+      this.fire();
+      emit_data = setInterval(()=>{
+        this.fire();
       }, interval);
 
       let growfile = this.get('growfile');
@@ -261,6 +186,18 @@ board.on('ready', function start() {
       this.start();
     },
 
+    fire: function () {
+      this.temp_data();
+      this.hum_data();
+      this.air_pressure_data();
+      this.light_data();
+      this.ph_data();
+      this.ec_data();
+      this.co2_data();
+      this.water_temp_data();
+      this.moisture_data();
+    },
+
     day: function () {
       this.call('light_on');
       this.set('currently', 'day');
@@ -273,84 +210,113 @@ board.on('ready', function start() {
       this.emit('message', 'It is now night.');
     },
 
+    turn_on: function (type) {
+        let types = this.get('types');
+        let outlets = types.actuators;
+        for (let outlet in outlets) {
+            if (outlets[outlet].role === type) {
+                this["relay" + outlets[outlet].number + "_on"]();
+                console.log(outlets[outlet]);
+                // update state of outlet
+                outlets[outlet].state = 'on';
+            }
+        }
+        types.actuators = outlets;
+        this.set('types', types);
+    },
+
+    turn_off: function (type) {
+        let types = this.get('types');
+        let outlets = types.actuators;
+        for (let outlet in outlets) {
+            if (outlets[outlet].role === type) {
+                this["relay" + outlets[outlet].number + "_off"]();
+                console.log(outlets[outlet]);
+                outlets[outlet].state = 'off';
+            }
+        }
+        types.actuators = outlets;
+        this.set('types', types);
+    },
+
     humidifier_on: function () {
-      this.set('humidifier', 'on');
+        this.turn_on('humidifier');
+        this.set('humidifier', 'on');
     },
 
     humidifier_off: function () {
-      this.set('humidifier', 'off');
+        this.turn_off('humidifier');
+        this.set('humidifier', 'off');
     },
 
     heater_on: function () {
-      this.set('heater', 'on');
+        this.turn_on('heater');
+        this.set('heater', 'on');
     },
 
     heater_off: function () {
-      this.set('heater', 'off');
+        this.turn_off('heater');
+        this.set('heater', 'off');
     },
 
     light_on: function () {
-      this.set('light', 'on');
+        this.turn_on('light');
+        this.set('light', 'on');
     },
 
     light_off: function () {
-      this.set('light', 'off');
+        this.turn_off('light');
+        this.set('light', 'off');
     },
 
     fan_on: function () {
-      this.set('fan', 'on');
+        this.turn_on('fan');
+        this.set('fan', 'on');
     },
 
     fan_off: function () {
-      this.set('fan', 'off');
+        this.turn_off('fan');
+        this.set('fan', 'off');
     },
 
     relay1_on: function () {
       let relay_name = this.get('relay1');
       this.call('on', relay_name);
-      this.set('acid', 'on');
     },
 
     relay1_off: function () {
       let relay_name = this.get('relay1');
       this.call('off', relay_name);
-      this.set('acid', 'off');
     },
 
     relay2_on: function () {
       let relay_name = this.get('relay2');
       this.call('on', relay_name);
-      this.set('base', 'on');
     },
 
     relay2_off: function () {
       let relay_name = this.get('relay2');
       this.call('off', relay_name);
-      this.set('base', 'off');
     },
 
     relay3_on: function () {
       let relay_name = this.get('relay3');
       this.call('on', relay_name);
-      this.set('nutrient_a', 'on');
     },
 
     relay3_off: function () {
         let relay_name = this.get('relay3');
         this.call('off', relay_name);
-        this.set('nutrient_a', 'off');
     },
 
     relay4_on: function () {
         let relay_name = this.get('relay4');
         this.call('on', relay_name);
-        this.set('nutrient_b', 'on');
     },
 
     relay4_off: function () {
         let relay_name = this.get('relay4');
         this.call('off', relay_name);
-        this.set('nutrient_b', 'off');
     },
 
     on: function(relay) {
@@ -389,25 +355,29 @@ board.on('ready', function start() {
       });
 
       if (!_.isUndefined(water_temp)) {
-        this.emit('water_temperature', water_temp);
+          this.emit('water_temperature', Number(water_temp));
 
-        console.log('Temperature: ' + water_temp);
+        console.log('Water Temperature: ' + water_temp);
       }
     },
 
     co2_data: function () {
-        let process = spawn('python', ['co2.py']);
-
-        process.stdout.on('data', (data)=> {
-            co2 = data;
-        });
-
         if (!_.isUndefined(co2)) {
-            this.emit('co2', co2);
+            if (!_.isUndefined(co2)) {
+                this.emit('co2', co2);
 
-            console.log('CO2 ppm: ' + co2);
+                console.log('CO2 ppm: ' + co2);
+            }
+        };
+    },
+
+    moisture_data: function () {
+        if (!_.isUndefined(moist_one) && !_.isUndefined(moist_two)) {
+           this.emit('moisture_1', moist_one);
+           this.emit('moisture_2', moist_two);
+           console.log('Moisture #1: ' + moist_one);
+           console.log('Moisture #2: ' + moist_two);
         }
-
     },
 
     light_data: function () {
@@ -428,7 +398,7 @@ board.on('ready', function start() {
     temp_data: function () {
       if (!_.isUndefined(temperature)) {
         this.emit('temperature', temperature);
-        console.log('Temperature: ' + temperature);
+        console.log('Air Temperature: ' + temperature);
       }
     },
 
@@ -455,7 +425,7 @@ board.on('ready', function start() {
 
   setTimeout(()=> {
     GrowHub.connect({
-      host: '10.0.0.26',
+      host: '10.0.0.2',
       port: 3000,
       // ssl: true
     });

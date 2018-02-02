@@ -2,6 +2,9 @@
 
 // Connects to Arduino nano over USB (serial) and parses repsonse.
 const serialport = require('serialport');
+
+// ls /dev/serial/by-path
+
 const portName = process.env.PORT || '/dev/serial/by-path/pci-0000:00:14.0-usb-0:2:1.0-port0';
 const sp = new serialport(portName, {
     baudRate: 9600,

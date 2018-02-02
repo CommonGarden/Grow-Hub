@@ -190,16 +190,7 @@ board.on('ready', function start() {
       this.heater_off();
 
       var interval = this.get('interval');
-
-      emit_data = setInterval(()=> {
-        this.temp_data();
-        this.hum_data();
-        this.air_pressure_data();
-        this.light_data();
-        this.ph_data();
-        this.ec_data();
-        this.water_temp_data();
-      }, interval);
+      emit_data = setInterval(this.fire, interval);
 
       let growfile = this.get('growfile');
       this.startGrow(growfile);
@@ -279,8 +270,6 @@ board.on('ready', function start() {
         }
       });
 
-      // console.log(this);
-
       this.emit('message', 'Running')
     },
 
@@ -295,6 +284,16 @@ board.on('ready', function start() {
       this.emit('message', 'Restarting');
       this.stop();
       this.start();
+    },
+
+    fire: function () {
+      this.temp_data();
+      this.hum_data();
+      this.air_pressure_data();
+      this.light_data();
+      this.ph_data();
+      this.ec_data();
+      this.water_temp_data();
     },
 
     day: function () {

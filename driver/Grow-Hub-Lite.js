@@ -62,7 +62,7 @@ board.on('ready', function start() {
       }, interval);
 
       let growfile = this.get('growfile');
-//      this.startGrow(growfile);
+      this.startGrow(growfile);
 
       this.emit('message', 'Running')
     },
@@ -90,6 +90,12 @@ board.on('ready', function start() {
     },
 
     ec_data: function () {
+        let process = spawn('python', ['eCReader.py']);
+
+        process.stdout.on('data', (data)=> {
+            console.log(data)
+        });
+
         if (eC_reading) {
             this.emit('ec', eC_reading);
 
@@ -98,6 +104,12 @@ board.on('ready', function start() {
     },
 
     ph_data: function () {
+        let process = spawn('python', ['pHReader.py']);
+
+        process.stdout.on('data', (data)=> {
+            console.log(data)
+        });
+
         if (pH_reading) {
             this.emit('ph', pH_reading);
 
@@ -135,11 +147,9 @@ board.on('ready', function start() {
     }
   }, 'data.json');
 
-  setTimeout(()=> {
-    GrowHub.connect({
-      host: '10.0.0.2',
+  GrowHub.connect({
+      host: 'grow.commongarden.org',
       port: 3000,
-      // ssl: true
-    });
-  }, 2000);
+      ssl: true
+  });
 });

@@ -64,7 +64,7 @@ module.exports = {
       },
       {
         type: 'co2',
-          title: 'Carbon Dioxide',
+        title: 'Carbon Dioxide',
         max: 5000,
       },
       {

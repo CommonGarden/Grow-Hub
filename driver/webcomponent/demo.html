@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>GrowHub</title>
+  <meta name="viewport" content="width=device-width">
+  <style>
+  .container {
+    width: 800px;
+    margin: 100px auto;
+    text-align: center;
+  }
+
+  .gauge {
+    width: 250px;
+    height: 250px;
+    display: inline-block;
+  }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="temperature" class="gauge" data-value="0"></div>
+    <div id="humidity" class="gauge" data-value="0"></div>
+    <div id="water_temperature" class="gauge" data-value="0"></div>
+    <div id="pH" class="gauge" data-value="0"></div>
+    <div id="conductivity" class="gauge" data-value="0"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.2.9/justgage.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+  var temperature, pH, conductivity;
+
+  $(function () {
+    var socket = io();
+
+    socket.on('temperature', function(msg){
+      temperature.refresh(msg * 9/5 + 32)
+    });
+
+    socket.on('humidity', function(msg){
+      humidity.refresh(msg)
+    });
+
+    socket.on('water_temperature', function(msg){
+      water_temperature.refresh(msg * 9/5 + 32)
+    });
+
+    socket.on('pH', function(msg){
+      pH.refresh(msg)
+    });
+
+    socket.on('conductivity', function(msg){
+      conductivity.refresh(msg)
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function(event) {
+    temperature = new JustGage({
+      id: 'temperature',
+      // title: 'javascript call',
+      label: "Temperature",
+      defaults: {
+        min: 0,
+        max: 100,
+        donut: true,
+        decimals: true,
+        gaugeWidthScale: 0.6,
+        counter: true,
+        hideInnerShadow: true
+      }
+    });
+
+    humidity = new JustGage({
+      id: 'humidity',
+      // title: 'javascript call',
+      label: "Humidity",
+      defaults: {
+        min: 0,
+        max: 100,
+        donut: true,
+        decimals: true,
+        gaugeWidthScale: 0.6,
+        counter: true,
+        hideInnerShadow: true
+      }
+    });
+
+    water_temperature = new JustGage({
+      id: 'water_temperature',
+      // title: 'javascript call',
+      label: "Water Temperature",
+      defaults: {
+        min: 0,
+        max: 100,
+        donut: true,
+        decimals: true,
+        gaugeWidthScale: 0.6,
+        counter: true,
+        hideInnerShadow: true
+      }
+    });
+
+    pH = new JustGage({
+      id: 'pH',
+      // title: 'data-attributes',
+      label: "pH",
+      defaults: {
+        min: 0,
+        max: 14,
+        donut: true,
+        decimals: true,
+        gaugeWidthScale: 0.6,
+        counter: true,
+        hideInnerShadow: true
+      }
+    });
+
+    conductivity = new JustGage({
+      id: 'conductivity',
+      // title: 'data-attributes',
+      label: 'EC',
+      defaults: {
+        min: 0,
+        max: 2000,
+        donut: true,
+        decimals: true,
+        gaugeWidthScale: 0.6,
+        counter: true,
+        hideInnerShadow: true
+      }
+    });
+  });
+
+  </script>
+</body>
+
+</html>

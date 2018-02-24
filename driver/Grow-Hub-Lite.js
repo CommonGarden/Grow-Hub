@@ -54,6 +54,34 @@ board.on('ready', function start() {
 
     start: function () {
       console.log('Grow-Hub initialized.');
+      var multi = new five.Multi({
+          controller: "BME280"
+      });
+
+      multi.on("data", function() {
+          console.log("Thermometer");
+
+          temperature = this.thermometer.celsius;
+          console.log("  celsius      : ", this.thermometer.celsius);
+          console.log("  fahrenheit   : ", this.thermometer.fahrenheit);
+          console.log("  kelvin       : ", this.thermometer.kelvin);
+          console.log("--------------------------------------");
+
+          pressure = this.barometer.pressure;
+          console.log("Barometer");
+          console.log("  pressure     : ", this.barometer.pressure);
+          console.log("--------------------------------------");
+
+          currentHumidity = this.hygrometer.relativeHumidity;
+          console.log("Hygrometer");
+          console.log("  humidity     : ", this.hygrometer.relativeHumidity);
+          console.log("--------------------------------------");
+
+          console.log("Altimeter");
+          console.log("  feet         : ", this.altimeter.feet);
+          console.log("  meters       : ", this.altimeter.meters);
+          console.log("--------------------------------------");
+      });
 
       var interval = this.get('interval');
       this.fire();
@@ -90,7 +118,7 @@ board.on('ready', function start() {
     },
 
     ec_data: function () {
-        let process = spawn('python', ['eCReader.py']);
+        let process = spawn('python', ['python/eCReader.py']);
 
         process.stdout.on('data', (data)=> {
             console.log(data)
@@ -104,7 +132,7 @@ board.on('ready', function start() {
     },
 
     ph_data: function () {
-        let process = spawn('python', ['pHReader.py']);
+        let process = spawn('python', ['python/pHReader.py']);
 
         process.stdout.on('data', (data)=> {
             console.log(data)

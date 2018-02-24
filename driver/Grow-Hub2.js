@@ -83,9 +83,7 @@ board.on('ready', function start() {
           let eC = this.parseAsciiResponse(bytes);
           // console.log(eC);
           if (eC) {
-              let regex = /(\d.\.?\d.),/;
-              eC_reading = eC.match(regex)[1];
-              console.log(eC_reading);
+              eC_reading =  eC.split(',')[0];
           }
       });
 
@@ -155,6 +153,12 @@ board.on('ready', function start() {
           }
         }
       });
+
+        this.addListener('co2', (value)=> {
+            if (value < 350) {
+                this.call('fan_on');
+            }
+        })
 
       this.addListener('lux', (value)=> {
         let threshold = Number(growfile.lux_threshold);
@@ -320,12 +324,10 @@ board.on('ready', function start() {
     },
 
     on: function(relay) {
-        console.log(relay);
         let process = spawn('usbrelay', [relay + '=1']);
     },
 
     off: function(relay) {
-        console.log(relay);
         let process = spawn('usbrelay', [relay + '=0']);
     },
 
@@ -348,7 +350,7 @@ board.on('ready', function start() {
     },
 
     water_temp_data: function () {
-      let process = spawn('python', ['max31865.py']);
+      let process = spawn('python', ['python/max31865.py']);
 
       process.stdout.on('data', (data)=> {
           water_temp = data;
@@ -425,9 +427,9 @@ board.on('ready', function start() {
 
   setTimeout(()=> {
     GrowHub.connect({
-      host: '10.0.0.2',
-      port: 3000,
-      // ssl: true
+      host: 'grow.commongarden.org',
+      port: 443,
+      ssl: true
     });
   }, 2000);
 });

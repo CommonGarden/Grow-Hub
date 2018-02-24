@@ -4,7 +4,7 @@
 const serialport = require('serialport');
 
 // ls /dev/serial/by-path
-
+// write code to find it.
 const portName = process.env.PORT || '/dev/serial/by-path/pci-0000:00:14.0-usb-0:2:1.0-port0';
 const sp = new serialport(portName, {
     baudRate: 9600,
@@ -17,7 +17,7 @@ sp.on('open', function(){
   sp.on('data', function(input) {
   	string.push(input.toString());
     // console.log(string.join(""));
-    // Make sure we have a complete data entry before we parse it.
+    // Make sure we have a complete data entry before we:w parse it.
   	let regex = /\r\n\r\n/;
   	if(string.join("").match(regex)) {
   	  let data = string.join("");

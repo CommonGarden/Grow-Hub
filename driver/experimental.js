@@ -7,6 +7,9 @@ let fs = require('fs');
 let hypercore = require('hypercore');
 
 let feed = hypercore('./data', {valueEncoding: 'utf-8'});
+feed.on('ready', ()=> {
+    console.log(feed.key);
+})
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/webcomponent/demo.html');
@@ -17,6 +20,9 @@ http.listen(port, function(){
 });
 
 let path = '/dev/serial/by-path/';
+
+let mostRecentLog = 0;
+
 fs.readdir(path, function(err, items) {
     console.log(items);
     for (let i=0; i<items.length; i++) {
@@ -43,8 +49,13 @@ fs.readdir(path, function(err, items) {
   	        // Make sure we have a complete data entry before we parse it.
   	        let regex = /uS\/cm\r\n/;
   	        if(string.join("").match(regex)) {
-  		          console.log(string.join(""));
-
+                let message = string.join('');
+                console.log(message);
+                feed.append(message, function (err) {
+                    if (err) throw err
+                    feed.get(mostRecentLog, console.log);
+                    mostRecentLog += 1;
+                });
   		          let data = string.join("");
   		          let tempRegEx = /Air\sTemperature:\s(.+)\*/;
   		          let humRegEx = /Humidity:\s(.+)%/;

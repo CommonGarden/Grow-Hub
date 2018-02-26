@@ -1,0 +1,35 @@
+{
+  "name": "Green house",
+  "batch": "#1",
+  "lux_threshold": 10000,
+  "targets": {
+     "temperature": {
+          "min": 50,
+          "max": 85,
+     },
+     "water_temperature": {
+          "min": 35,
+          "max": 90
+      },
+      "co2": {
+          "min": 350,
+          "max": 5000
+      },
+      "ph": {
+          "min": 5.5,
+          "max": 7,
+      },
+      "ec": {
+          "min": 200,
+          "max": 1500,
+      }
+  },
+  "cycles": {
+    "light_on": {
+      "schedule": "after 6:00pm"
+    },
+    "light_off": {
+      "schedule": "after 10:00am"
+    }
+  }
+}

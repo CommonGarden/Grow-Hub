@@ -7,14 +7,15 @@ const fs = require('fs');
 let path = '/dev/serial/by-path/';
 
 fs.readdir(path, function(err, items) {
-    console.log(items);
     for (var i=0; i<items.length; i++) {
         console.log(items[i]);
         path = path + items[i];
     }
 
     const portName = process.env.PORT || path;
+
     console.log(portName);
+
     const sp = new serialport(portName, {
         baudRate: 9600,
     });
@@ -49,7 +50,7 @@ fs.readdir(path, function(err, items) {
                     console.log(err)
                     // console.log(data)
                 }
-                console.log(temp, humidity, pressure, lux, co2, moist_one, moist_two);
+                // console.log(temp, humidity, pressure, lux, co2, moist_one, moist_two);
                 string = [];
   	        }
         });

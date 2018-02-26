@@ -39,7 +39,7 @@ let nano = spawn('node', ['nano.js']);
 
 nano.stdout.on('data', (data)=> {
   let parsedData = data.toString().split(" ");
-  temperature = parsedData[0];
+  temperature = Number(parsedData[0]) * 1.8 + 32;
   currentHumidity = parsedData[2];
   pressure = parsedData[4];
   light_data = parsedData[5];
@@ -79,9 +79,7 @@ board.on('ready', function start() {
       board.i2cConfig();
 
       board.i2cRead(0x64, 32, (bytes)=> {
-          // console.log(bytes);
           let eC = this.parseAsciiResponse(bytes);
-          // console.log(eC);
           if (eC) {
               eC_reading =  eC.split(',')[0];
           }
@@ -116,10 +114,10 @@ board.on('ready', function start() {
       this.startGrow(growfile);
 
       // Turn the fan on or off. Gee, wouldn't it be nice to do this stuff with a gui?
+      /*
       this.addListener('correction', (key, correction)=> {
-        console.log('Key: ' + key + '  Correction: ' + correction);
+        // console.log('Key: ' + key + '  Correction: ' + correction);
         let temp_threshold = growfile.temperature_threshold;
-        let hum_threshold = growfile.humidity_threshold;
         let fan_state = this.get('fan');
         if (key === 'temperature' || key ==='water_temperature') {
           if (correction > temp_threshold) {
@@ -136,35 +134,41 @@ board.on('ready', function start() {
             }
           }
         }
+      });*/
 
-        if (key === 'humidity') {
-          if (correction > hum_threshold) {
-            if (fan_state !== 'off') {
-              this.call('fan_off');
-              this.call('heater_on');
-              this.emit('message', 'Too cold, heater on, fan off.');
-            }
-          } else {
-            if (fan_state === 'off') {
+      this.addListener('temperature', (value)=> {
+          if (value > growfile.targets.temperature.max) {
               this.call('fan_on');
               this.call('heater_off');
-              this.emit('message', 'Too warm, fan on, heater_off.');
-            }
           }
-        }
+
+          if (value < growfile.targets.temperature.min) {
+              this.call('fan_off');
+              this.call('heater_off');
+          }
       });
 
-        this.addListener('co2', (value)=> {
-            if (value < 350) {
-                this.call('fan_on');
-            }
-        })
+
+      this.addListener('humidity', (value) => {
+          if (value > growfile.targets.humidity.max) {
+              this.call('fan_on');
+          }
+          if (value < growfile.targets.humidity.min) {
+              this.call('fan_off');
+          }
+      });
+
+      this.addListener('co2', (value)=> {
+          if (value < growfile.targets.co2.min) {
+              this.call('fan_on');
+          }
+      });
 
       this.addListener('lux', (value)=> {
         let threshold = Number(growfile.lux_threshold);
-        let timeOfDay = this.get('currently');
+        let light_state = this.get('light');
         if (value <= threshold) {
-          if (timeOfDay === 'day') {
+          if (light_state === 'off') {
             this.call('light_on');
             this.emit('message', 'Too dark, turning light on');
           }
@@ -200,18 +204,6 @@ board.on('ready', function start() {
       this.co2_data();
       this.water_temp_data();
       this.moisture_data();
-    },
-
-    day: function () {
-      this.call('light_on');
-      this.set('currently', 'day');
-      this.emit('message', 'It is now day.');
-    },
-
-    night: function () {
-      this.call('light_off');
-      this.set('currently', 'night');
-      this.emit('message', 'It is now night.');
     },
 
     turn_on: function (type) {
@@ -353,11 +345,11 @@ board.on('ready', function start() {
       let process = spawn('python', ['python/max31865.py']);
 
       process.stdout.on('data', (data)=> {
-          water_temp = data;
+          water_temp = Number(data) * 1.8 + 32;
       });
 
       if (!_.isUndefined(water_temp)) {
-          this.emit('water_temperature', Number(water_temp));
+        this.emit('water_temperature', water_temp);
 
         console.log('Water Temperature: ' + water_temp);
       }

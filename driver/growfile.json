@@ -8,32 +8,36 @@
   "ec_threshold": 200,
   "nutrient_a_b_ratio": 0.5,
   "targets": {
-    "water_temperature": {
-      "min": 17,
-      "max": 28
-    },
-    "ph": {
-      "min": 5.5,
-      "ideal": 6,
-      "max": 7,
-      "pid": {
-        "k_p": 200,
-        "k_i": 0,
-        "k_d": 100,
-        "dt": 1
+      "water_temperature": {
+          "min": 17,
+          "max": 28
+      },
+      "co2": {
+          "min": 300,
+          "max": 5000
+      },
+      "ph": {
+          "min": 5.5,
+          "ideal": 6,
+          "max": 7,
+          "pid": {
+              "k_p": 200,
+              "k_i": 0,
+              "k_d": 100,
+              "dt": 1
+          }
+      },
+      "ec": {
+          "min": 200,
+          "ideal": 800,
+          "max": 1500,
+          "pid": {
+              "k_p": 20,
+              "k_i": 0,
+              "k_d": 10,
+              "dt": 1
+          }
       }
-    },
-    "ec": {
-      "min": 200,
-      "ideal": 800,
-      "max": 1500,
-      "pid": {
-        "k_p": 20,
-        "k_i": 0,
-        "k_d": 10,
-        "dt": 1
-      }
-    }
   },
   "cycles": {
     "day": {
@@ -50,7 +54,7 @@
           }
         }
       },
-      "schedule": "after 8:00am"
+      "schedule": "after 6:00pm"
     },
     "night": {
       "targets": {
@@ -66,7 +70,7 @@
           }
         }
       },
-      "schedule": "after 7:00pm"
+      "schedule": "after 10:00am"
     }
   }
 }

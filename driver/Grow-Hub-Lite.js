@@ -1,5 +1,5 @@
-const uuid = 'greenmeow';
-const token = 'greenmeow';
+const uuid = 'test_device';
+const token = '12345678';
 
 const Grow = require('Grow.js');
 const raspio = require('raspi-io');
@@ -40,6 +40,17 @@ const board = new five.Board({
   io: new raspio()
 });
 
+let ph_process = spawn('python', ['python/pHReader.py']);
+let ec_process = spawn('python', ['python/eCReader.py']);
+
+ph_process.stdout.on('data', (data)=> {
+    console.log(data)
+});
+
+ec_process.stdout.on('data', (data)=> {
+    console.log(data);
+});
+
 // When board emits a 'ready' event run this start function.
 board.on('ready', function start() {
   let GrowHub = new Grow({
@@ -54,34 +65,6 @@ board.on('ready', function start() {
 
     start: function () {
       console.log('Grow-Hub initialized.');
-      var multi = new five.Multi({
-          controller: "BME280"
-      });
-
-      multi.on("data", function() {
-          console.log("Thermometer");
-
-          temperature = this.thermometer.celsius;
-          console.log("  celsius      : ", this.thermometer.celsius);
-          console.log("  fahrenheit   : ", this.thermometer.fahrenheit);
-          console.log("  kelvin       : ", this.thermometer.kelvin);
-          console.log("--------------------------------------");
-
-          pressure = this.barometer.pressure;
-          console.log("Barometer");
-          console.log("  pressure     : ", this.barometer.pressure);
-          console.log("--------------------------------------");
-
-          currentHumidity = this.hygrometer.relativeHumidity;
-          console.log("Hygrometer");
-          console.log("  humidity     : ", this.hygrometer.relativeHumidity);
-          console.log("--------------------------------------");
-
-          console.log("Altimeter");
-          console.log("  feet         : ", this.altimeter.feet);
-          console.log("  meters       : ", this.altimeter.meters);
-          console.log("--------------------------------------");
-      });
 
       var interval = this.get('interval');
       this.fire();
@@ -118,12 +101,6 @@ board.on('ready', function start() {
     },
 
     ec_data: function () {
-        let process = spawn('python', ['python/eCReader.py']);
-
-        process.stdout.on('data', (data)=> {
-            console.log(data)
-        });
-
         if (eC_reading) {
             this.emit('ec', eC_reading);
 
@@ -132,12 +109,6 @@ board.on('ready', function start() {
     },
 
     ph_data: function () {
-        let process = spawn('python', ['python/pHReader.py']);
-
-        process.stdout.on('data', (data)=> {
-            console.log(data)
-        });
-
         if (pH_reading) {
             this.emit('ph', pH_reading);
 
@@ -177,7 +148,7 @@ board.on('ready', function start() {
 
   GrowHub.connect({
       host: 'grow.commongarden.org',
-      port: 3000,
+      port: 443,
       ssl: true
   });
 });

@@ -3,9 +3,13 @@
   "batch": "#1",
   "lux_threshold": 10000,
   "targets": {
+     "humidity": {
+          "min":15,
+          "max":85
+     },
      "temperature": {
           "min": 50,
-          "max": 85,
+          "max": 85
      },
      "water_temperature": {
           "min": 35,
@@ -17,11 +21,11 @@
       },
       "ph": {
           "min": 5.5,
-          "max": 7,
+          "max": 7
       },
       "ec": {
           "min": 200,
-          "max": 1500,
+          "max": 1500
       }
   },
   "cycles": {

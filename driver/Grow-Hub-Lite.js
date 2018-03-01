@@ -19,20 +19,7 @@ let pH_reading,
   currentHumidity,
   pressure,
   eC_reading,
-  DO_reading,
-  orp_reading,
   emit_data,
-  co2,
-  moist_one,
-  moist_two,
-  light_data,
-  water_temp,
-  fan,
-  humidifier,
-  light,
-  multi,
-  level,
-  level_ref,
   lux;
 
 // Create a new board object
@@ -129,13 +116,13 @@ board.on('ready', function start() {
       let process = spawn('python', ['python/tsl2561/test.py']);
 
       process.stdout.on('data', (data)=> {
-          light_data = data;
+          lux = data;
       });
 
-      if (!_.isUndefined(light_data)) {
-        this.emit('lux', light_data)
+      if (!_.isUndefined(lux)) {
+          this.emit('lux', lux);
 
-        console.log('Lux: ' + light_data)
+          console.log('Lux: ' + lux);
       }
     },
 

@@ -58,13 +58,9 @@ def main():
 
     """
     phr = pHReader()
-    while True:
-        sample = phr.read()
-        print sample
-        print phr.calc_ph(sample)
-        print
-        time.sleep(1)
-
+    sample = phr.read()
+    print sample
+    print phr.calc_ph(sample)
 
 if __name__ == '__main__':
     main()

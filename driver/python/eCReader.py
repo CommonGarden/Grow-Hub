@@ -8,10 +8,10 @@
  Evan Galpin 2015
 """
 import smbus as I2C
-import pHParams
+import eCParams
 import time
 
-class pHReader(object):
+class eCReader(object):
     """Reads values from the pH probe + MinipH and converts to pH
     """
     def __init__(self, addr=0x4C, busnum=-1):
@@ -30,7 +30,7 @@ class pHReader(object):
         """
         self.addr = addr
         self.i2c = I2C.SMBus(1)
-        self.params = pHParams.pHParams()
+        self.params = eCParams.eCParams()
 
 
     def read(self):
@@ -42,7 +42,7 @@ class pHReader(object):
         return (reading[0] << 8) + reading[1]
 
 
-    def calc_ph(self, reading):
+    def calc_eC(self, reading):
         """Calculates the pH based on millivolts reading from ADC of MinipH
 
         :param reading: Raw 12-bit reading from MinipH
@@ -57,14 +57,10 @@ def main():
     obtain calibration readings.
 
     """
-    phr = pHReader()
-    while True:
-        sample = phr.read()
-        print sample
-        print phr.calc_ph(sample)
-        print
-        time.sleep(1)
-
+    ecr = eCReader()
+    sample = ecr.read()
+    print sample
+    print ecr.calc_eC(sample)
 
 if __name__ == '__main__':
     main()

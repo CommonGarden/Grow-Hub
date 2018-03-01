@@ -92,9 +92,18 @@ board.on('ready', function start() {
     },
 
     fire: function () {
-      this.temp_data();
-      this.hum_data();
-      this.air_pressure_data();
+      let process = spawn('python', ['python/BME280/read_BME280.py']);
+
+      process.stdout.on('data', (data)=> {
+            console.log(data);
+            // temperature = data;
+            // currentHumidity = data;
+            // pressure = data;
+            this.temp_data();
+            this.hum_data();
+            this.air_pressure_data();
+      });
+
       this.light_data();
       this.ph_data();
       this.ec_data();
@@ -117,8 +126,14 @@ board.on('ready', function start() {
     },
 
     light_data: function () {
+      let process = spawn('python', ['python/tsl2561/test.py']);
+
+      process.stdout.on('data', (data)=> {
+          light_data = data;
+      });
+
       if (!_.isUndefined(light_data)) {
-        this.emit('lux', light_data);
+        this.emit('lux', light_data)
 
         console.log('Lux: ' + light_data)
       }

@@ -27,17 +27,6 @@ const board = new five.Board({
   io: new raspio()
 });
 
-let ph_process = spawn('python', ['python/pHReader.py']);
-let ec_process = spawn('python', ['python/eCReader.py']);
-
-ph_process.stdout.on('data', (data)=> {
-    console.log(data)
-});
-
-ec_process.stdout.on('data', (data)=> {
-    console.log(data);
-});
-
 // When board emits a 'ready' event run this start function.
 board.on('ready', function start() {
   let GrowHub = new Grow({
@@ -60,7 +49,7 @@ board.on('ready', function start() {
       }, interval);
 
       let growfile = this.get('growfile');
-      this.startGrow(growfile);
+      this.registerTargets(growfile.targets);
 
       this.emit('message', 'Running')
     },
@@ -82,7 +71,7 @@ board.on('ready', function start() {
       let process = spawn('python', ['python/BME280/read_BME280.py']);
 
       process.stdout.on('data', (data)=> {
-            console.log(data);
+          console.log(data.toString());
             // temperature = data;
             // currentHumidity = data;
             // pressure = data;
@@ -97,6 +86,13 @@ board.on('ready', function start() {
     },
 
     ec_data: function () {
+        let ec_process = spawn('python', ['python/eCReader.py']);
+
+        ec_process.stdout.on('data', (data)=> {
+            console.log(data.toString());
+            eC_reading = data;
+        });
+
         if (eC_reading) {
             this.emit('ec', eC_reading);
 
@@ -105,10 +101,17 @@ board.on('ready', function start() {
     },
 
     ph_data: function () {
-        if (pH_reading) {
-            this.emit('ph', pH_reading);
+       let ph_process = spawn('python', ['python/pHReader.py']);
 
-            console.log('ph: ' + pH_reading);
+       ph_process.stdout.on('data', (data)=> {
+           console.log(data.toString());
+           pH_reading = data;
+       });
+
+       if (pH_reading) {
+           this.emit('ph', pH_reading);
+
+           console.log('ph: ' + pH_reading);
         }
     },
 
@@ -116,6 +119,7 @@ board.on('ready', function start() {
       let process = spawn('python', ['python/tsl2561/test.py']);
 
       process.stdout.on('data', (data)=> {
+          console.log(data.toString());
           lux = data;
       });
 

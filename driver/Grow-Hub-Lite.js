@@ -121,8 +121,7 @@ board.on('ready', function start() {
       let process = spawn('python', ['python/tsl2561/test.py']);
 
       process.stdout.on('data', (data)=> {
-          console.log(data.toString());
-          // lux = data;
+          lux = data.toString();
       });
 
       if (!_.isUndefined(lux)) {

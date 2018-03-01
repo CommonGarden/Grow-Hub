@@ -236,8 +236,8 @@ class TSL2561(object):
             clipThreshold = TSL2561_CLIPPING_402MS
 
         # Return 0 lux if the sensor is saturated
-        if broadband > clipThreshold or ir > clipThreshold:
-            raise Exception('Sensor is saturated')
+        # if broadband > clipThreshold or ir > clipThreshold:
+        #    raise Exception('Sensor is saturated')
 
         # Get the correct scale depending on the integration time
         if self.integration_time == TSL2561_INTEGRATIONTIME_13MS:

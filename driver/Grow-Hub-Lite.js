@@ -70,11 +70,11 @@ board.on('ready', function start() {
     fire: function () {
       let process = spawn('python', ['python/BME280/read_BME280.py']);
 
-      process.stdout.on('data', (data)=> {
-          console.log(data.toString());
-            // temperature = data;
-            // currentHumidity = data;
-            // pressure = data;
+        process.stdout.on('data', (data)=> {
+            data = data.toString().split(' ');
+            temperature = Number(data[0]).toFixed(2);
+            currentHumidity = Number(data[1]).toFixed(2);
+            pressure = Number(data[2]).toFixed(2);
             this.temp_data();
             this.hum_data();
             this.air_pressure_data();
@@ -89,8 +89,9 @@ board.on('ready', function start() {
         let ec_process = spawn('python', ['python/eCReader.py']);
 
         ec_process.stdout.on('data', (data)=> {
-            console.log(data.toString());
-            eC_reading = data;
+            data = data.toString().split(' ');
+            console.log(data);
+            eC_reading = data[0];
         });
 
         if (eC_reading) {
@@ -104,8 +105,9 @@ board.on('ready', function start() {
        let ph_process = spawn('python', ['python/pHReader.py']);
 
        ph_process.stdout.on('data', (data)=> {
-           console.log(data.toString());
-           pH_reading = data;
+           data = data.toString().split(' ');
+           console.log(data);
+           pH_reading = data[0];
        });
 
        if (pH_reading) {
@@ -120,7 +122,7 @@ board.on('ready', function start() {
 
       process.stdout.on('data', (data)=> {
           console.log(data.toString());
-          lux = data;
+          // lux = data;
       });
 
       if (!_.isUndefined(lux)) {

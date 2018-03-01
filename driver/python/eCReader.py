@@ -59,8 +59,7 @@ def main():
     """
     ecr = eCReader()
     sample = ecr.read()
-    print sample
-    print ecr.calc_eC(sample)
+    print sample, ecr.calc_eC(sample)
 
 if __name__ == '__main__':
     main()

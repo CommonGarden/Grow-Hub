@@ -7,7 +7,7 @@ const five = require('johnny-five');
 const later = require('later');
 const _ = require('underscore');
 const spawn = require('child_process').spawn;
-const growfile_example = require('./growfile.json');
+const growfile_example = require('./simple-growfile.json');
 const types = require('./lite_types.js');
 
 // Use local time, not UTC.

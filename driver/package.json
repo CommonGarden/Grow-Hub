@@ -1,7 +1,7 @@
 {
-  "name": "cg-atlas-grow-hub",
+  "name": "cg-grow-hub",
   "version": "0.4.0",
-  "description": "A Grow-Hub driver supporting Raspberry Pi and Atlas Scientific sensors.",
+  "description": "Various Grow-Hub raspberry-pi drivers",
   "main": "Grow-Hub.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

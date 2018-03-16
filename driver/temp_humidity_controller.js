@@ -115,13 +115,29 @@ board.on('ready', function start() {
       this.start();
     },
 
+      humidifier_off: function () {
+          console.log('Humidifier off');
+          if (this.humidifier) {
+              this.humidifier.setPowerState(false);
+          }
+          this.set('humidifier', 'off');
+      },
+
+      humidifier_on: function () {
+          console.log('Humidifier on');
+          if (this.humidifier) {
+              this.humidifier.setPowerState(true);
+          }
+          this.set('humidifier', 'on');
+      },
+
     fire: function () {
       let process = spawn('python', ['python/SHT30.py']);
 
         process.stdout.on('data', (data)=> {
             data = data.toString().split(' ');
-            temperature = Number(data[0]).toFixed(2);
-            currentHumidity = Number(data[1]).toFixed(2);
+            temperature = Number(data[1]).toFixed(2);
+            currentHumidity = Number(data[0]).toFixed(2);
             this.temp_data();
             this.hum_data();
       });

@@ -116,7 +116,7 @@ board.on('ready', function start() {
     },
 
     fire: function () {
-      let process = spawn('python', ['python/BME280/read_BME280.py']);
+      let process = spawn('python', ['python/SHT30.py']);
 
         process.stdout.on('data', (data)=> {
             data = data.toString().split(' ');

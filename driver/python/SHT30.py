@@ -28,4 +28,4 @@ fTemp = cTemp * 1.8 + 32
 humidity = 100 * (data[3] * 256 + data[4]) / 65535.0
 
 # Output data to screen
-print "%.2f %.2f %.2f" %humidity %fTemp %cTemp
+print "%.2f %.2f %.2f" % (humidity, fTemp, cTemp)

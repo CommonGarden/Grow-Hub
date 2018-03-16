@@ -28,6 +28,4 @@ fTemp = cTemp * 1.8 + 32
 humidity = 100 * (data[3] * 256 + data[4]) / 65535.0
 
 # Output data to screen
-print "Relative Humidity : %.2f %%RH" %humidity
-print "Temperature in Celsius : %.2f C" %cTemp
-print "Temperature in Fahrenheit : %.2f F" %fTemp
+print "%.2f %.2f %.2f" %humidity %fTemp %cTemp

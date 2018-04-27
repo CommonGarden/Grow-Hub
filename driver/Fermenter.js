@@ -1,5 +1,5 @@
-const uuid = '48d7251e-45c2-43b3-84bd-cdac0bd8c412';
-const token = '3XMJdsSsTqmxMYjEMzaBtqrGwk7hxozv';
+const uuid = 'fermenter';
+const token = '12345678';
 
 const Grow = require('Grow.js');
 const raspio = require('raspi-io');
@@ -7,8 +7,8 @@ const five = require('johnny-five');
 const later = require('later');
 const _ = require('underscore');
 const spawn = require('child_process').spawn;
-const growfile_example = require('./simple-growfile.json');
-const types = require('./types.js');
+const growfile_example = require('./growfiles/simple.json');
+const types = require('./fermenter_types.js');
 
 // Use local time, not UTC.
 later.date.localTime();
@@ -286,7 +286,7 @@ board.on('ready', function start() {
       let process = spawn('python', ['python/max31865.py']);
 
       process.stdout.on('data', (data)=> {
-          water_temp = Number(data) * 1.8 + 32;
+          water_temp = Number(data);
       });
 
       if (!_.isUndefined(water_temp)) {

@@ -189,7 +189,8 @@ void loop(void)
   if (event.light)
   {
     Serial.print("lux: ");
-    Serial.print(event.light); Serial.println(" (good)");
+    Serial.print(event.light);
+    Serial.println(" (good)");
   }
   else
   {

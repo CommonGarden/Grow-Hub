@@ -98,7 +98,18 @@ board.on('ready', function start() {
 
       let growfile = this.get('growfile');
       this.registerTargets(growfile.targets);
-
+      this.addListener('correction', (key, correction)=> {
+            console.log('Key: ' + key + '  Correction: ' + correction);
+      });
+        this.addListener('humidity', (value)=> {
+            let humidityTargets = growfile.targets.humidity;
+            if (value < humidityTargets.min) {
+                this.call('humidifier_on');
+            }
+            if (value > humidityTargets.max) {
+                this.call('humidifier_off');
+            }
+        });
       this.emit('message', 'Running')
     },
 

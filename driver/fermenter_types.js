@@ -21,13 +21,6 @@ module.exports = {
       title: 'Heater',
       role: 'heater'
     },
-    {
-      type: 'relay',
-      state: 'off',
-      number: 4,
-      title: 'Light',
-      role: 'light'
-    }
   ],
   sensors: [
       {
@@ -50,23 +43,10 @@ module.exports = {
         max: 2000
       },
       {
-        type: 'orp',
-        title: 'ORP',
-        icon: 'wi wi-raindrop',
-        min: -2000,
-        max: 2000
-      },
-      {
         type: 'lux',
         title: 'Lux',
         icon: 'wi wi-day-sunny',
         max: 10000
-      },
-      {
-        type: 'dissolved_oxygen',
-        title: 'Dissolved Oxygen',
-        icon: 'wi wi-raindrop',
-        max: 36,
       },
       {
         type: 'ph',
@@ -87,25 +67,5 @@ module.exports = {
         unit: 'wi wi-celsius',
         max: 40,
       },
-      {
-        type: 'water_level',
-        title: 'Water level',
-        max: 100,
-      },
-      {
-        type: 'co2',
-        title: 'Carbon Dioxide',
-        max: 5000,
-      },
-      {
-        type: 'moisture_1',
-        title: 'Moisture sensor #1',
-        max: 100
-      },
-      {
-        type: 'moisture_2',
-        title: 'Moisture sensor #2',
-        max: 100
-      }
     ]
 }

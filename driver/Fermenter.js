@@ -1,5 +1,5 @@
-const uuid = 'test';
-const token = 'test';
+const uuid = '48d7251e-45c2-43b3-84bd-cdac0bd8c412';
+const token = '3XMJdsSsTqmxMYjEMzaBtqrGwk7hxozv';
 
 const Grow = require('Grow.js');
 const raspio = require('raspi-io');
@@ -19,12 +19,7 @@ let pH_reading,
   currentHumidity,
   pressure,
   eC_reading,
-  DO_reading,
-  orp_reading,
   emit_data,
-  co2,
-  moist_one,
-  moist_two,
   light_data,
   water_temp,
   fan,
@@ -39,23 +34,11 @@ let nano = spawn('node', ['nano.js']);
 
 // TODO: better error handling with this script.
 nano.stdout.on('data', (data)=> {
-  try {
-    let parsedData = data.toString().split(" ");
-    temperature = Number(parsedData[0]) * 1.8 + 32;
-    currentHumidity = parsedData[2];
-    pressure = parsedData[4];
-    light_data = parsedData[5];
-    co2 = parsedData[6];
-    moist_one = parsedData[7];
-    moist_two = parsedData[8];
-  } catch (err) {
-    console.log(err);
-    nano.kill();
-  }
-});
-
-nano.stderr.on('data', (data) => {
-  console.log(data.toString());
+  let parsedData = data.toString().split(" ");
+  temperature = Number(parsedData[0]) * 1.8 + 32;
+  currentHumidity = parsedData[2];
+  pressure = parsedData[4];
+  light_data = parsedData[5];
 });
 
 // Create a new board object
@@ -65,6 +48,11 @@ const board = new five.Board({
 
 // When board emits a 'ready' event run this start function.
 board.on('ready', function start() {
+	// Define variables
+	outlet_1 = new five.Pin('GPIO26');
+	outlet_2 = new five.Pin('GPIO21');
+	outlet_3 = new five.Pin('GPIO20');
+
   let GrowHub = new Grow({
     uuid: uuid,
     token: token,
@@ -101,20 +89,6 @@ board.on('ready', function start() {
         if (pH) pH_reading = pH;
       });
 
-      let process = spawn('usbrelay');
-
-      // Find all the relays
-      process.stdout.on('data', (data)=> {
-          let regex = /(.+_.)/;
-          let datalist = data.toString().split('\n');
-          let i = 1;
-          for (let relay of datalist) {
-              let match = relay.match(regex);
-              if (match) this.set('relay' + i, match[1]);
-              i += 1;
-          }
-      });
-
       var interval = this.get('interval');
       this.fire();
       emit_data = setInterval(()=>{
@@ -124,8 +98,6 @@ board.on('ready', function start() {
       let growfile = this.get('growfile');
       this.startGrow(growfile);
 
-      // Turn the fan on or off. Gee, wouldn't it be nice to do this stuff with a gui?
-      /*
       this.addListener('correction', (key, correction)=> {
         // console.log('Key: ' + key + '  Correction: ' + correction);
         let temp_threshold = growfile.temperature_threshold;
@@ -145,57 +117,9 @@ board.on('ready', function start() {
             }
           }
         }
-      });*/
+      });
 
       // REDO this control system.
-      this.addListener('temperature', (value)=> {
-          if (value > growfile.targets.temperature.max) {
-              this.call('fan_on');
-              this.call('heater_off');
-          }
-
-          if (value < growfile.targets.temperature.min) {
-              this.call('fan_off');
-              this.call('heater_off');
-          }
-      });
-
-      this.addListener('humidity', (value) => {
-          if (value > growfile.targets.humidity.max) {
-              this.call('fan_on');
-          }
-          if (value < growfile.targets.humidity.min) {
-              this.call('fan_off');
-          }
-      });
-
-      // HACK co2 is plugged into humidifier.
-      this.addListener('co2', (value)=> {
-        if (value < growfile.targets.co2.min) {
-          this.call('humidifier_on');
-        }
-        if (value > growfile.targets.co2.target) {
-          this.call('humidifier_off');
-        }
-        if (value > growfile.targets.co2.max) {
-          this.call('humidifier_off');
-        }
-      });
-
-      this.addListener('lux', (value)=> {
-        let threshold = Number(growfile.lux_threshold);
-        let light_state = this.get('light');
-        if (value <= threshold) {
-          if (light_state === 'off') {
-            this.call('light_on');
-            this.emit('message', 'Too dark, turning light on');
-          }
-        } else if (value >= threshold) {
-          this.call('light_off');
-          this.emit('message', 'Sufficient light, saving energy.');
-        }
-      });
-
       this.emit('message', 'Running')
     },
 
@@ -223,9 +147,7 @@ board.on('ready', function start() {
       this.light_data();
       this.ph_data();
       this.ec_data();
-      this.co2_data();
       this.water_temp_data();
-      this.moisture_data();
     },
 
     turn_on: function (type) {
@@ -374,25 +296,6 @@ board.on('ready', function start() {
       }
     },
 
-    co2_data: function () {
-        if (!_.isUndefined(co2)) {
-            if (!_.isUndefined(co2)) {
-              this.emit('co2', Number(co2));
-
-                console.log('CO2 ppm: ' + co2);
-            }
-        };
-    },
-
-    moisture_data: function () {
-        if (!_.isUndefined(moist_one) && !_.isUndefined(moist_two)) {
-          this.emit('moisture_1', Number(moist_one));
-          this.emit('moisture_2', Number(moist_two));
-          console.log('Moisture #1: ' + moist_one);
-          console.log('Moisture #2: ' + moist_two);
-        }
-    },
-
     light_data: function () {
       if (!_.isUndefined(light_data)) {
         this.emit('lux', Number(light_data));
@@ -421,7 +324,7 @@ board.on('ready', function start() {
         console.log('Humidity: ' + currentHumidity);
       }
     }
-  }, 'data.json');
+  });
 
   // Clean up on exit, make sure everything is off.
   this.on('exit', function() {

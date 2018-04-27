@@ -48,9 +48,8 @@ fs.readdir(path, function(err, items) {
                     moist_two = data.match(moist2)[1];
                 } catch (err) {
                     console.log(err)
-                    // console.log(data)
                 }
-                // console.log(temp, humidity, pressure, lux, co2, moist_one, moist_two);
+                console.log(temp, humidity, pressure, lux, co2, moist_one, moist_two);
                 string = [];
   	        }
         });

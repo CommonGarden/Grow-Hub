@@ -24,7 +24,7 @@ module.exports = {
   ],
   sensors: [
       {
-        type: 'temperature',
+        type: 'temp',
         title: 'Air Temperature',
         icon: 'wi wi-thermometer',
         unit: 'wi wi-celsius',

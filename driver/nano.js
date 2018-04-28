@@ -47,7 +47,7 @@ fs.readdir(path, function(err, items) {
                     moist_one = data.match(moist1)[1];
                     moist_two = data.match(moist2)[1];
                 } catch (err) {
-                    console.log(err)
+                    // console.log(err)
                 }
                 console.log(temp, humidity, pressure, lux, co2, moist_one, moist_two);
                 string = [];

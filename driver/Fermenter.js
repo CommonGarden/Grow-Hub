@@ -63,7 +63,6 @@ board.on('ready', function start() {
       heater: 'off',
       humidifier: 'off',
       light: 'off',
-      duration: 2000,
       interval: 10000,
       currently: null,
       types: types,
@@ -217,51 +216,27 @@ board.on('ready', function start() {
     },
 
     relay1_on: function () {
-      let relay_name = this.get('relay1');
-      this.call('on', relay_name);
+      outlet_1.high();
     },
 
     relay1_off: function () {
-      let relay_name = this.get('relay1');
-      this.call('off', relay_name);
+      outlet_1.low();
     },
 
     relay2_on: function () {
-      let relay_name = this.get('relay2');
-      this.call('on', relay_name);
+      outlet_2.high();
     },
 
     relay2_off: function () {
-      let relay_name = this.get('relay2');
-      this.call('off', relay_name);
+      outlet_2.low();
     },
 
     relay3_on: function () {
-      let relay_name = this.get('relay3');
-      this.call('on', relay_name);
+      outlet_3.high();
     },
 
     relay3_off: function () {
-        let relay_name = this.get('relay3');
-        this.call('off', relay_name);
-    },
-
-    relay4_on: function () {
-        let relay_name = this.get('relay4');
-        this.call('on', relay_name);
-    },
-
-    relay4_off: function () {
-        let relay_name = this.get('relay4');
-        this.call('off', relay_name);
-    },
-
-    on: function(relay) {
-        let process = spawn('usbrelay', [relay + '=1']);
-    },
-
-    off: function(relay) {
-        let process = spawn('usbrelay', [relay + '=0']);
+      outlet_3.low();
     },
 
     ec_data: function () {
@@ -328,14 +303,9 @@ board.on('ready', function start() {
 
   // Clean up on exit, make sure everything is off.
   this.on('exit', function() {
-    GrowHub.call('light_off');
-    GrowHub.call('fan_off');
-    GrowHub.call('humidifier_off');
-    GrowHub.call('heater_off');
     GrowHub.call('relay1_off');
     GrowHub.call('relay2_off');
     GrowHub.call('relay3_off');
-    GrowHub.call('relay4_off');
     nano.kill();
   });
 

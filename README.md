@@ -50,7 +50,7 @@ For development it's easier to simply connect to you local computer. Find your c
 ```
 
 ### Run on boot
-Once you're happy with your driver you'll want to start it on boot in case your device looses power.
+Once you're happy with your driver you'll want to start it on boot in case your device loses power.
 
 Install [forever](https://www.npmjs.com/package/forever) globally.
 

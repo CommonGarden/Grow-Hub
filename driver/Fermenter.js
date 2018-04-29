@@ -53,6 +53,10 @@ board.on('ready', function start() {
 	outlet_2 = new five.Pin('GPIO21');
 	outlet_3 = new five.Pin('GPIO20');
 
+  outlet_1.high();
+  outlet_2.high();
+  outlet_3.high();
+
   let GrowHub = new Grow({
     uuid: uuid,
     token: token,

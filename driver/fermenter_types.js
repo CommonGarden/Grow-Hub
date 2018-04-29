@@ -4,21 +4,21 @@ module.exports = {
       type: 'relay',
       state: 'off',
       number: 1,
-      title: '1',
+      title: 'NFT Pump',
       role: 'fan'
     },
     {
       type: 'relay',
       state: 'off',
       number: 2,
-      title: '2',
+      title: 'Biochar Pump',
       role: 'humidifier'
     },
     {
       type: 'relay',
       state: 'off',
       number: 3,
-      title: '3',
+      title: 'Doser Pump',
       role: 'heater'
     },
   ],

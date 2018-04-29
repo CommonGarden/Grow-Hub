@@ -4,27 +4,27 @@ module.exports = {
       type: 'relay',
       state: 'off',
       number: 1,
-      title: 'Fan',
+      title: '1',
       role: 'fan'
     },
     {
       type: 'relay',
       state: 'off',
       number: 2,
-      title: 'Humidifier',
+      title: '2',
       role: 'humidifier'
     },
     {
       type: 'relay',
       state: 'off',
       number: 3,
-      title: 'Heater',
+      title: '3',
       role: 'heater'
     },
   ],
   sensors: [
       {
-        type: 'temp',
+        type: 'temperature',
         title: 'Air Temperature',
         icon: 'wi wi-thermometer',
         unit: 'wi wi-celsius',

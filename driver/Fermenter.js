@@ -35,7 +35,7 @@ let nano = spawn('node', ['nano.js']);
 // TODO: better error handling with this script.
 nano.stdout.on('data', (data)=> {
   let parsedData = data.toString().split(" ");
-  temperature = Number(parsedData[0]) * 1.8 + 32;
+  temperature = parsedData[0];
   currentHumidity = parsedData[2];
   pressure = parsedData[4];
   light_data = parsedData[5];
@@ -216,27 +216,27 @@ board.on('ready', function start() {
     },
 
     relay1_on: function () {
-      outlet_1.high();
-    },
-
-    relay1_off: function () {
       outlet_1.low();
     },
 
-    relay2_on: function () {
-      outlet_2.high();
+    relay1_off: function () {
+      outlet_1.high();
     },
 
-    relay2_off: function () {
+    relay2_on: function () {
       outlet_2.low();
     },
 
+    relay2_off: function () {
+      outlet_2.high();
+    },
+
     relay3_on: function () {
-      outlet_3.high();
+      outlet_3.low();
     },
 
     relay3_off: function () {
-      outlet_3.low();
+      outlet_3.high();
     },
 
     ec_data: function () {

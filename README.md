@@ -49,7 +49,7 @@ For development it's easier to simply connect to you local computer. Find your c
   });
 ```
 
-### Run on boot
+## Run on boot
 Once you're happy with your driver you'll want to start it on boot in case your device loses power.
 
 Install [forever](https://www.npmjs.com/package/forever) globally:
@@ -128,7 +128,7 @@ Reboot and your pi should start into the Grow-Hub driver.
 To check the logs, ssh into the raspberry pi and see the `out.log` and `error.log` files in the home directory. An additional `forever.log` file can be found in the `driver/` folder. See [forever](https://www.npmjs.com/package/forever) documentation for more info.
 
 
-### Optional Bluetooth setup
+## Optional Bluetooth setup
 These instructions come from this [Headless Raspberry Pi configuration over Bluetooth](https://hacks.mozilla.org/2017/02/headless-raspberry-pi-configuration-over-bluetooth/) article. Thanks to Mozilla and Patrick Hundal for providing an excellent resource.
 
 Let’s start by creating the main script that will set up and establish the default Bluetooth services and serial port you will connect to on startup.

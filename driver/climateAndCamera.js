@@ -7,17 +7,16 @@ const five = require('johnny-five');
 const later = require('later');
 const _ = require('underscore');
 const spawn = require('child_process').spawn;
-const NodeWebcam = require( 'node-webcam' );
+const RaspiCam = require( 'raspicam' );
 const fs = require('fs');
 
-const opts = {
-  width: 1280,
-  height: 720,
-  delay: 0,
-  quality: 100,
-  output: 'jpeg',
-  verbose: true
-}
+
+let camera = new RaspiCam({
+  mode: 'photo',
+  output: './image.jpg',
+  encoding: 'jpg',
+  timeout: 0 // take the picture immediately
+}),
 
 // Use local time, not UTC.
 later.date.localTime();
@@ -76,6 +75,13 @@ board.on('ready', function start() {
     start: function () {
       console.log('Grow-Hub initialized.');
 
+      camera.on('read', ( err, timestamp, filename ) => {
+        fs.readFile('./image.jpg', (err, data) => {
+          if (err) throw err; // Fail if the file can't be read.
+          this.sendImage(data);
+        });
+      });
+
       var interval = this.get('interval');
       var picture_interval = this.get('picture_interval');
 
@@ -107,25 +113,22 @@ board.on('ready', function start() {
     },
 
     fire: function () {
-      let process = spawn('python', ['python/SHT30.py']);
+      let process = spawn('python', ['python/BME280/read_BME280.py']);
 
       process.stdout.on('data', (data)=> {
-            data = data.toString().split(' ');
-            temperature = Number(data[1]).toFixed(2);
-            currentHumidity = Number(data[0]).toFixed(2);
-            this.temp_data();
-            this.hum_data();
+        data = data.toString().split(' ');
+        temperature = Number(data[0]).toFixed(2);
+        currentHumidity = Number(data[1]).toFixed(2);
+        pressure = Number(data[2]).toFixed(2);
+        this.temp_data();
+        this.hum_data();
+        this.pressure_data();
       });
     },
 
     picture: function () {
-      NodeWebcam.capture( 'image', opts, ( err, data )=> {
-        if ( !err ) console.log( 'Image created!' );
-        fs.readFile('./' + data, (err, data) => {
-          if (err) throw err; // Fail if the file can't be read.
-          this.sendImage(data);
-        });
-      });
+      this.camera.start();
+      this.camera.stop();
     },
 
     temp_data: function () {
@@ -140,8 +143,15 @@ board.on('ready', function start() {
         this.emit('humidity', currentHumidity);
         console.log('Humidity: ' + currentHumidity);
       }
+    },
+
+    pressure_data: function () {
+      if (!_.isUndefined(pressure)) {
+        this.emit('pressure', pressure);
+        console.log('Air pressure: ' + pressure);
+      }
     }
-  });
+ });
 
   GrowHub.connect({
       host: 'grow.commongarden.org',

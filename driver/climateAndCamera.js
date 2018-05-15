@@ -16,10 +16,7 @@ let camera = new RaspiCam({
   output: './image.jpg',
   encoding: 'jpg',
   timeout: 0 // take the picture immediately
-}),
-
-// Use local time, not UTC.
-later.date.localTime();
+});
 
 // Declare variables
 let temperature,

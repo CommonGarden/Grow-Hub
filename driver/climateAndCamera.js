@@ -38,7 +38,7 @@ board.on('ready', function start() {
     component: 'NewHub',
     properties: {
       interval: 10000,
-      picture_interval: 100000,
+      picture_interval: 10000,
       types: {
         camera: true,
         sensors: [
@@ -52,7 +52,14 @@ board.on('ready', function start() {
             type: 'humidity',
             title: 'Humidity',
             icon: 'wi wi-humidity',
+          },
+          {
+            type: 'pressure',
+            title: 'Atmospheric pressure',
+            icon: 'wi wi-barometer',
+            max: 2000
           }
+
         ]
       },
       growfile: {
@@ -124,8 +131,8 @@ board.on('ready', function start() {
     },
 
     picture: function () {
-      this.camera.start();
-      this.camera.stop();
+      camera.start();
+      camera.stop();
     },
 
     temp_data: function () {

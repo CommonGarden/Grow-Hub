@@ -28,18 +28,35 @@ let pH_reading,
   multi,
   level,
   level_ref,
-  lux;
+  lux,
+  nano;
 
-let nano = spawn('node', ['nano.js']);
+let parseArduinoData = function () {
+  nano = spawn('node', ['nano.js']);
 
-// TODO: better error handling with this script.
-nano.stdout.on('data', (data)=> {
-  let parsedData = data.toString().split(" ");
-  temperature = parsedData[0];
-  currentHumidity = parsedData[2];
-  pressure = parsedData[4];
-  light_data = parsedData[5];
-});
+  nano.stdout.on('data', (data)=> {
+    try {
+      let parsedData = data.toString().split(" ");
+      temperature = parsedData[0];
+      currentHumidity = parsedData[2];
+      pressure = parsedData[4];
+      light_data = parsedData[5];
+    } catch (err) {
+      console.log(err);
+      nano.kill();
+    }
+  });
+
+  nano.stderr.on('data', (data) => {
+    console.log(data.toString());
+  });
+
+  nano.on('exit', (data) => {
+    parseArduinoData();
+  });
+}
+
+parseArduinoData();
 
 // Create a new board object
 const board = new five.Board({

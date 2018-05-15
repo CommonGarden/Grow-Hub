@@ -1,8 +1,7 @@
 {
   "name": "cg-grow-hub",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Various Grow-Hub raspberry-pi drivers",
-  "main": "Grow-Hub.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,8 +12,9 @@
     "Grow.js": "^0.4.17",
     "express": "^4.15.2",
     "hypercore": "^6.12.2",
-    "later": "^1.2.0",
     "johnny-five": "0.14.1",
+    "later": "^1.2.0",
+    "node-webcam": "^0.4.3",
     "raspi-io": "^8.1.0",
     "serialport": "^5.0.0",
     "socket.io": "^1.7.3",

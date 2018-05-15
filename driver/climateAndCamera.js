@@ -10,7 +10,6 @@ const spawn = require('child_process').spawn;
 const RaspiCam = require( 'raspicam' );
 const fs = require('fs');
 
-
 let camera = new RaspiCam({
   mode: 'photo',
   output: './image.jpg',
@@ -59,7 +58,6 @@ board.on('ready', function start() {
             icon: 'wi wi-barometer',
             max: 2000
           }
-
         ]
       },
       growfile: {
@@ -155,7 +153,7 @@ board.on('ready', function start() {
         console.log('Air pressure: ' + pressure);
       }
     }
- });
+  });
 
   GrowHub.connect({
       host: 'grow.commongarden.org',

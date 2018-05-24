@@ -42,7 +42,7 @@ board.on('ready', function start() {
         camera: true,
         sensors: [
           {
-            type: 'temp',
+            type: 'temperature',
             title: 'Air Temperature',
             icon: 'wi wi-thermometer',
             unit: 'wi wi-celsius',

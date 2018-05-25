@@ -8,12 +8,12 @@
           "max":85
      },
      "temperature": {
-          "min": 50,
-          "max": 85
+          "min": 5,
+          "max": 40
      },
      "water_temperature": {
-          "min": 35,
-          "max": 90
+          "min": 5,
+          "max": 35
       },
       "co2": {
           "min": 350,

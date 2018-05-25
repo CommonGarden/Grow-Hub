@@ -9,7 +9,7 @@
   "author": "Common Garden",
   "license": "MIT",
   "dependencies": {
-    "Grow.js": "^0.4.3",
+    "Grow.js": "^0.4.4",
     "express": "^4.15.2",
     "hypercore": "^6.12.2",
     "johnny-five": "0.14.1",

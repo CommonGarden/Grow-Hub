@@ -1,6 +1,6 @@
 {
   "name": "cg-grow-hub",
-  "version": "0.4.1",
+  "version": "0.4.5",
   "description": "Various Grow-Hub raspberry-pi drivers",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,7 @@
   "author": "Common Garden",
   "license": "MIT",
   "dependencies": {
-    "Grow.js": "^0.4.2",
+    "Grow.js": "^0.4.3",
     "express": "^4.15.2",
     "hypercore": "^6.12.2",
     "johnny-five": "0.14.1",

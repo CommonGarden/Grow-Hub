@@ -78,16 +78,14 @@ board.on('ready', function start() {
       console.log('Grow-Hub initialized.');
 
       camera.on('read', ( err, timestamp, filename ) => {
-        fs.readFile('./image.jpg', (err, data) => {
-          if (err) throw err; // Fail if the file can't be read.
-          this.sendImage(data);
-        });
+        console.log(err, timestamp, filename);
       });
 
       var interval = this.get('interval');
       var picture_interval = this.get('picture_interval');
 
       this.fire();
+      this.picture();
       emit_data = setInterval(()=>{
         this.fire();
       }, interval);
@@ -131,7 +129,11 @@ board.on('ready', function start() {
     picture: function () {
       camera.start();
       camera.stop();
-    },
+      fs.readFile('./image.jpg', (err, data) => {
+        if (err) throw err; // Fail if the file can't be read.
+        this.sendImage(data);
+      });
+   },
 
     temp_data: function () {
       if (!_.isUndefined(temperature)) {

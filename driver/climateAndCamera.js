@@ -129,10 +129,16 @@ board.on('ready', function start() {
     picture: function () {
       camera.start();
       camera.stop();
-      fs.readFile('./image.jpg', (err, data) => {
-        if (err) throw err; // Fail if the file can't be read.
-        this.sendImage(data);
-      });
+      // wait for image to be saved, before reading it.
+      setTimeout(()=> {
+        fs.readFile('./image.jpg', (err, data) => {
+          if (err) {
+            console.log(err);
+          } else {
+            this.sendImage(data);
+          }
+        });
+      }, 1000);
    },
 
     temp_data: function () {

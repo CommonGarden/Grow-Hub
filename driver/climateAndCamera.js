@@ -7,17 +7,8 @@ const five = require('johnny-five');
 const later = require('later');
 const _ = require('underscore');
 const spawn = require('child_process').spawn;
-const RaspiCam = require( 'raspicam' );
 const fs = require('fs');
 
-let camera = new RaspiCam({
-  mode: 'photo',
-  output: './image.jpg',
-  encoding: 'jpg',
-  timeout: 0 // take the picture immediately
-});
-
-// Declare variables
 let temperature,
     currentHumidity,
     pressure,
@@ -127,8 +118,7 @@ board.on('ready', function start() {
     },
 
     picture: function () {
-      camera.start();
-      camera.stop();
+      let takePic = spawn('raspistill', ['-o', 'image.jpg'])
       // wait for image to be saved, before reading it.
       setTimeout(()=> {
         fs.readFile('./image.jpg', (err, data) => {
@@ -138,7 +128,7 @@ board.on('ready', function start() {
             this.sendImage(data);
           }
         });
-      }, 1000);
+      }, 3000);
    },
 
     temp_data: function () {

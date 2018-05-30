@@ -68,10 +68,6 @@ board.on('ready', function start() {
     start: function () {
       console.log('Grow-Hub initialized.');
 
-      camera.on('read', ( err, timestamp, filename ) => {
-        console.log(err, timestamp, filename);
-      });
-
       var interval = this.get('interval');
       var picture_interval = this.get('picture_interval');
 

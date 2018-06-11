@@ -151,10 +151,14 @@ board.on('ready', function start() {
 
     // Set open
     vent_off: function () {
+      this.relay2_off();
+      this.relay1_on();
       this.set('vent', 'off');
     },
 
     vent_on: function () {
+      this.relay1_off();
+      this.relay2_on();
       this.set('vent', 'on');
     },
 
@@ -213,6 +217,12 @@ board.on('ready', function start() {
       }
     }
   }, 'data.json');
+
+  // Clean up on exit, make sure everything is off.
+  this.on('exit', function() {
+    GrowHub.call('relay1_off');
+    GrowHub.call('relay2_off');
+  });
 
   GrowHub.connect({
     host: 'grow.commongarden.org',

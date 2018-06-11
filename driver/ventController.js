@@ -1,3 +1,22 @@
+/*
+ Vent logic, heat only
+
+ 6:00 AM, begin operation
+
+ If greater than 70, open (all open sequences last for 6 seconds, adjustable as needed)
+
+ Wait 15 min (also adjustable, but let’ start with 15
+
+ If greater than 70 but less than 80, do nothing
+ If greater than 80, open (again for 6 seconds, until otherwise determined)
+ If less than 70, close
+ Wait 15 minutes (standard deal all day)
+
+ 7:00 PM
+
+ If less than 70, close completely and start again in the morning
+ If greater than 80, open and keep it open all night, start again in the morning.
+*/
 const uuid = process.env.uuid || 'SchoolGrow1';
 const token = process.env.token || '12345678';
 
@@ -35,7 +54,7 @@ board.on('ready', function start() {
       types: {
         sensors: [
           {
-            type: 'temp',
+            type: 'temperature',
             title: 'Air Temperature',
             icon: 'wi wi-thermometer',
             unit: 'wi wi-celsius',
@@ -144,7 +163,7 @@ board.on('ready', function start() {
 
       process.stdout.on('data', (data)=> {
         data = data.toString().split(' ');
-        temperature = Number(data[0]).toFixed(2);
+        temperature = Number(data[0]).toFixed(2) * 9 / 5 + 32;
         currentHumidity = Number(data[1]).toFixed(2);
         pressure = Number(data[2]).toFixed(2);
         this.temp_data();
@@ -193,7 +212,6 @@ board.on('ready', function start() {
         console.log('Air pressure: ' + pressure);
       }
     }
-  });
   }, 'data.json');
 
   GrowHub.connect({

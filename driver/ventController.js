@@ -126,10 +126,10 @@ board.on('ready', function start() {
       this.addListener('temperature', (value)=> {
         let temperature = growfile.targets.temperature;
         if (value < temperature.close) {
-          this.call('vent_on');
+          this.call('vent_off');
         }
         if (value > temperature.open) {
-          this.call('vent_off');
+          this.call('vent_on');
         }
       });
 
@@ -154,12 +154,14 @@ board.on('ready', function start() {
       this.relay2_off();
       this.relay1_on();
       this.set('vent', 'off');
+      console.log('vent closing');
     },
 
     vent_on: function () {
       this.relay1_off();
       this.relay2_on();
       this.set('vent', 'on');
+      console.log('vent opening')
     },
 
     fire: function () {

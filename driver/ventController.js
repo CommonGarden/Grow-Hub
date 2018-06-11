@@ -176,6 +176,14 @@ board.on('ready', function start() {
       });
     },
 
+    on: function(relay) {
+      let process = spawn('usbrelay', [relay + '=1']);
+    },
+
+    off: function(relay) {
+      let process = spawn('usbrelay', [relay + '=0']);
+    },
+
     relay1_on: function () {
       let relay_name = this.get('relay1');
       this.call('on', relay_name);

@@ -42,6 +42,8 @@ const board = new five.Board({
   io: new raspio()
 });
 
+let vent_int = 0;
+
 // When board emits a 'ready' event run this start function.
 board.on('ready', function start() {
   let GrowHub = new Grow({
@@ -49,7 +51,7 @@ board.on('ready', function start() {
     token: token,
     component: 'NewHub',
     properties: {
-      interval: 10000,
+      interval: 30000,
       currently: null,
       types: {
         sensors: [
@@ -149,19 +151,32 @@ board.on('ready', function start() {
       this.start();
     },
 
-    // Set open
+    // Closes vent
     vent_off: function () {
-      this.relay2_off();
-      this.relay1_on();
-      this.set('vent', 'off');
-      console.log('vent closing');
+      if (vent_int > 0) {
+        this.relay2_off();
+        this.relay1_on();
+        this.set('vent', 'off');
+        console.log('vent closing');
+        vent_int -= 1;
+        setTimeout(()=> {
+          this.relay1_off()
+        }, 6000);
+      }
     },
 
+    // Opens vent
     vent_on: function () {
-      this.relay1_off();
-      this.relay2_on();
-      this.set('vent', 'on');
-      console.log('vent opening')
+      if (vent_int<=3) {
+        this.relay1_off();
+        this.relay2_on();
+        this.set('vent', 'on');
+        console.log('vent opening')
+        vent_int += 1;
+        setTimeout(()=> {
+          this.relay2_off()
+        }, 6000);
+      }
     },
 
     fire: function () {

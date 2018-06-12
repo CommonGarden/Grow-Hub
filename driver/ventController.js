@@ -51,7 +51,7 @@ board.on('ready', function start() {
     token: token,
     component: 'NewHub',
     properties: {
-      interval: 30000,
+      interval: 60000,
       currently: null,
       types: {
         sensors: [
@@ -59,7 +59,7 @@ board.on('ready', function start() {
             type: 'temperature',
             title: 'Air Temperature',
             icon: 'wi wi-thermometer',
-            unit: 'wi wi-celsius',
+            unit: 'wi wi-fahrenheit',
             max: 40
           },
           {
@@ -91,7 +91,7 @@ board.on('ready', function start() {
           temperature: {
             min: 40,
             open: 85,
-            close: 45,
+            close: 60,
             max: 100,
           }
         }
@@ -151,9 +151,22 @@ board.on('ready', function start() {
       this.start();
     },
 
+    // TODO: Manual opening and closing
+    open: function () {
+      console.log('Open')
+    },
+
+    close: function () {
+      console.log('Closed')
+    },
+
+    // BUG: we don't know the state of the vent when we start the script
+    // The script starts with vent_int == 0 (vent is closed)
+    // vent == 3 means the vent is open.
+
     // Closes vent
     vent_off: function () {
-      if (vent_int > 0) {
+      if (vent_int >= 0) {
         this.relay2_off();
         this.relay1_on();
         this.set('vent', 'off');
@@ -167,7 +180,7 @@ board.on('ready', function start() {
 
     // Opens vent
     vent_on: function () {
-      if (vent_int<=3) {
+      if (vent_int <= 3) {
         this.relay1_off();
         this.relay2_on();
         this.set('vent', 'on');

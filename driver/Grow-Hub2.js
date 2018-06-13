@@ -36,6 +36,11 @@ let pH_reading,
   lux,
   nano;
 
+// Kill the nano.js process if it is already running.
+// Otherwise USB sensor modules will not reconnect.
+spawn('pkill', ['-f', 'node nano.js']);
+
+// Spawns nano.js process which reads values over serial from a USB sensor module
 let parseArduinoData = function () {
   nano = spawn('node', ['nano.js']);
 

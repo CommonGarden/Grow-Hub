@@ -1,5 +1,5 @@
-const uuid = 'test';
-const token = 'test';
+const uuid = 'GrowHub2';
+const token = '12345678';
 
 const Grow = require('Grow.js');
 const raspio = require('raspi-io');
@@ -89,7 +89,7 @@ board.on('ready', function start() {
       humidifier: 'off',
       light: 'off',
       duration: 2000,
-      interval: 10000,
+      interval: 100000,
       currently: null,
       types: types,
       growfile: growfile_example

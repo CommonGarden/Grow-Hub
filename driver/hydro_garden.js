@@ -123,6 +123,7 @@ board.on('ready', function start() {
       humidifier: 'off',
       light: 'off',
       interval: 10000,
+      picture_interval: 100000,
       currently: null,
       types: types,
       growfile: growfile_example
@@ -196,7 +197,7 @@ board.on('ready', function start() {
       this.emit('flow_rate_1', flow_rate_1);
       this.emit('flow_rate_2', flow_rate_2);
       this.emit('water_level', water_level);
-      this.emit('water_level_etape', water_level_etape_signal);
+      this.emit('water_level_etape', water_level_etape);
     },
 
     turn_on: function (type) {
@@ -370,7 +371,6 @@ board.on('ready', function start() {
     GrowHub.call('relay1_off');
     GrowHub.call('relay2_off');
     GrowHub.call('relay3_off');
-    nano.kill();
   });
 
   setTimeout(()=> {

@@ -241,7 +241,7 @@ void loop()
   {  
     Serial.println("Water Level (float): LOW");  
   } else {  
-    Serial.println("Water Level (float): GOOD/HIGH");  
+    Serial.println("Water Level (float): GOOD");  
   }
 
   flow_frequency1 = 0;                   //reset counter
@@ -269,19 +269,20 @@ void loop()
   /* Read eTape sensor */
   WLsensREAD = analogRead(WLsensPIN);
   WLrefREAD = analogRead(WLrefPIN);
-  Serial.print("Water Level Sensor (eTape) Signal: ");
-  Serial.println(WLsensREAD);
-  Serial.print("Water Level Sensor (eTape) Reference: ");
-  Serial.println(WLrefREAD);
+  //Serial.print("Water Level Sensor (eTape) Signal: ");
+  //Serial.println(WLsensREAD);
+  //Serial.print("Water Level Sensor (eTape) Reference: ");
+  //Serial.println(WLrefREAD);
   
-  /* //calculate difference here & map it, optional
+  //calculate difference here & map it, optional
   int WLsensDiff = (WLrefREAD - WLsensREAD);
-  int WLsensMap = map(WLsensDiff, 0, WLrefREAD, 0, 100);
-  Serial.print("Water Level difference: ");
-  Serial.println(WLsensDiff);
-  Serial.print("Water Level map: ");
-  Serial.println(WLsensMap);
-  */
+  int WLsensMap = map(WLsensDiff, 5, 265, 0, 100);
+  //Serial.print("Water Level Sensor (eTape) difference: ");
+  //Serial.println(WLsensDiff);
+  Serial.print("Water Level Sensor (eTape): ");
+  Serial.print(WLsensMap);
+  Serial.println(" %");
+  
   
   delay(2000);
 

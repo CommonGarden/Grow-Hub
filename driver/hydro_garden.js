@@ -293,7 +293,7 @@ board.on('ready', function start() {
     },
 
     picture: function () {
-      let takePic = spawn('raspistill', ['-o', 'image.jpg'])
+      let takePic = spawn('raspistill', ['-o', 'image.jpg', '-q', '10'])
       // wait for image to be saved, before reading it.
       setTimeout(()=> {
         fs.readFile('./image.jpg', (err, data) => {

@@ -1,4 +1,4 @@
-const uuid = 'MPhydrogarden';
+const uuid = 'fermenter';
 const token = '12345678';
 
 const Grow = require('Grow.js');

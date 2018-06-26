@@ -44,13 +44,10 @@ let path = '/dev/serial/by-path/';
 
 fs.readdir(path, function(err, items) {
   for (var i=0; i<items.length; i++) {
-    console.log(items[i]);
     path = path + items[i];
   }
 
   const portName = process.env.PORT || path;
-
-  console.log(portName);
 
   const sp = new serialport(portName, {
     baudRate: 9600,
@@ -65,7 +62,6 @@ fs.readdir(path, function(err, items) {
   	  let regex = /\r\n\r\n/;
   	  if(string.join("").match(regex)) {
         let data = string.join("");
-        console.log(data);
         let tempRegEx = /Temperature\s\(BME280\):\s(.+)\*/;
   	    let humRegEx = /Humidity\s\(BME280\):\s(.+)%/;
         let pressureRegEx = /Pressure\s\(BME280\):\s(.+)\sh/;
@@ -192,12 +188,18 @@ board.on('ready', function start() {
       this.ph_data();
       this.ec_data();
       this.water_temp_data();
-      this.emit('bed_temperature', bed_temp);
-      this.emit('bed_humidity', bed_humidity);
-      this.emit('flow_rate_1', flow_rate_1);
-      this.emit('flow_rate_2', flow_rate_2);
-      this.emit('water_level', water_level);
-      this.emit('water_level_etape', water_level_etape);
+      if (bed_temp) this.emit('bed_temp', bed_temp);
+      if (bed_humidity) this.emit('bed_humidity', bed_humidity);
+      if (flow_rate_1) this.emit('flow_rate_1', flow_rate_1);
+      if (flow_rate_2) this.emit('flow_rate_2', flow_rate_2);
+      if (water_level) this.emit('water_level', water_level);
+      if (water_level_etape) this.emit('water_level_etape', water_level_etape);
+      console.log('Bed Temperature: ' + bed_temp);
+      console.log('Bed Humidity: '+ bed_humidity);
+      console.log('Flow rate 1: ' + flow_rate_1);
+      console.log('Flow rate 2: ' + flow_rate_2);
+      console.log('Water level: ' + water_level);
+      console.log('Water level (etape): ' + water_level_etape);
     },
 
     turn_on: function (type) {
@@ -375,6 +377,7 @@ board.on('ready', function start() {
 
   setTimeout(()=> {
     GrowHub.connect({
+      // host: '192.168.1.25'
       host: 'grow.commongarden.org',
       port: 443,
       ssl: true

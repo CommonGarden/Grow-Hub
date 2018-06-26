@@ -69,7 +69,7 @@ module.exports = {
     },
     {
       type: 'bed_humidity',
-      title: 'Humidity',
+      title: 'Bed humidity',
       icon: 'wi wi-humidity',
     },
     {

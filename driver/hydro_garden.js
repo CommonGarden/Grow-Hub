@@ -15,7 +15,6 @@ later.date.localTime();
 
 // Declare variables
 let temperature,
-  currentHumidity,
   pressure,
   eC_reading,
   pH_reading,
@@ -74,16 +73,16 @@ fs.readdir(path, function(err, items) {
         let water_level_Regex = /\$(.+)\$/;
 
         try {
-          temperature = data.match(tempRegEx)[1];
-          humidity = data.match(humRegEx)[1];
-          pressure = data.match(pressureRegEx)[1];
-          light_data = data.match(luxRegEx)[1];
-          bed_temp = data.match(bedTempRegEx)[1];
-          bed_humidity = data.match(bedHumRegEx)[1];
-          flow_rate_1 = data.match(flow_rate_1_Regex)[1];
-          flow_rate_2 = data.match(flow_rate_2_Regex)[1];
-          water_level = data.match(water_level_Regex)[1];
-          water_level_etape = data.match(water_level_etape_Regex)[1];
+          temperature = Number(data.match(tempRegEx)[1]);
+          humidity = Number(data.match(humRegEx)[1]);
+          pressure = Number(data.match(pressureRegEx)[1]);
+          light_data = Number(data.match(luxRegEx)[1]);
+          bed_temp = Number(data.match(bedTempRegEx)[1]);
+          bed_humidity = Number(data.match(bedHumRegEx)[1]);
+          flow_rate_1 = Number(data.match(flow_rate_1_Regex)[1]);
+          flow_rate_2 = Number(data.match(flow_rate_2_Regex)[1]);
+          water_level = Number(data.match(water_level_Regex)[1]);
+          water_level_etape = Number(data.match(water_level_etape_Regex)[1]);
         } catch (err) {
           // console.log(err)
         }
@@ -361,9 +360,9 @@ board.on('ready', function start() {
     },
 
     hum_data: function () {
-      if (!_.isUndefined(currentHumidity)) {
-        this.emit('humidity', Number(currentHumidity));
-        console.log('Humidity: ' + currentHumidity);
+      if (!_.isUndefined(humidity)) {
+        this.emit('humidity', Number(humidity));
+        console.log('Humidity: ' + humidity);
       }
     }
   });

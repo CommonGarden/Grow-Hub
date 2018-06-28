@@ -187,12 +187,12 @@ board.on('ready', function start() {
       this.ph_data();
       this.ec_data();
       this.water_temp_data();
-      if (bed_temp) this.emit('bed_temp', bed_temp);
-      if (bed_humidity) this.emit('bed_humidity', bed_humidity);
-      if (flow_rate_1) this.emit('flow_rate_1', flow_rate_1);
-      if (flow_rate_2) this.emit('flow_rate_2', flow_rate_2);
-      if (water_level) this.emit('water_level', water_level);
-      if (water_level_etape) this.emit('water_level_etape', water_level_etape);
+      if (!_.isUndefined(bed_temp)) this.emit('bed_temp', bed_temp);
+      if (!_.isUndefined(bed_humidity)) this.emit('bed_humidity', bed_humidity);
+      if (!_.isUndefined(flow_rate_1)) this.emit('flow_rate_1', flow_rate_1);
+      if (!_.isUndefined(flow_rate_2)) this.emit('flow_rate_2', flow_rate_2);
+      if (!_.isUndefined(water_level)) this.emit('water_level', water_level);
+      if (!_.isUndefined(water_level_etape)) this.emit('water_level_etape', water_level_etape);
       console.log('Bed Temperature: ' + bed_temp);
       console.log('Bed Humidity: '+ bed_humidity);
       console.log('Flow rate 1: ' + flow_rate_1);

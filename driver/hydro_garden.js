@@ -33,63 +33,47 @@ let temperature,
   humidity,
   altitude,
   bed_temp,
-  bed_humidity;
+  bed_humidity,
+  nano;
 
-// Connects to Arduino nano over USB (serial) and parses repsonse.
-const serialport = require('serialport');
-const fs = require('fs');
+// Kill the nano.js process if it is already running.
+// Otherwise USB sensor modules will not reconnect.
+spawn('pkill', ['-f', 'node nano.js']);
 
-let path = '/dev/serial/by-path/';
+// Spawns nano.js process which reads values over serial from a USB sensor module
+let parseArduinoData = function () {
+  nano = spawn('node', ['hydro_garden_arduino.js']);
 
-fs.readdir(path, function(err, items) {
-  for (var i=0; i<items.length; i++) {
-    path = path + items[i];
-  }
-
-  const portName = process.env.PORT || path;
-
-  const sp = new serialport(portName, {
-    baudRate: 9600,
+  nano.stdout.on('data', (data)=> {
+    try {
+      let parsedData = data.toString().split(" ");
+      console.log(parsedData);
+      temperature = Number(parsedData[0]);
+      humidity = parsedData[2];
+      pressure = parsedData[4];
+      light_data = parsedData[5];
+      bed_temp = parsedData[6];
+      bed_humidity = parsedData[7];
+      flow_rate_1 = parsedData[8];
+      flow_rate_2 = parsedData[9];
+      water_level = parsedData[10];
+      water_level_etape = parsedData[11];
+    } catch (err) {
+      console.log(err);
+      nano.kill();
+    }
   });
 
-
-  sp.on('open', function(){
-    let string = [];
-    sp.on('data', function(input) {
-  	  string.push(input.toString());
-      // Make sure we have a complete data entry before we parse it.
-  	  let regex = /\r\n\r\n/;
-  	  if(string.join("").match(regex)) {
-        let data = string.join("");
-        let tempRegEx = /Temperature\s\(BME280\):\s(.+)\*/;
-  	    let humRegEx = /Humidity\s\(BME280\):\s(.+)%/;
-        let pressureRegEx = /Pressure\s\(BME280\):\s(.+)\sh/;
-        let luxRegEx = /Light\s\(TSL2561\):\s(\d+\.?\d+)\s?\(?/;
-        let bedTempRegEx = /Temperature\s\(SHT10\):\s(.+)\*/;
-  	    let bedHumRegEx = /Humidity\s\(SHT10\):\s(.+)%/;
-        let flow_rate_1_Regex= /Flow\sRate\sPump\s1:\s(.+)\sL/;
-        let flow_rate_2_Regex = /Flow\sRate\sPump\s2:\s(.+)\sL/;
-        let water_level_etape_Regex = /\(eTape\):\s(.+)\s%/;
-        let water_level_Regex = /\$(.+)\$/;
-
-        try {
-          temperature = Number(data.match(tempRegEx)[1]);
-          humidity = Number(data.match(humRegEx)[1]);
-          pressure = Number(data.match(pressureRegEx)[1]);
-          light_data = Number(data.match(luxRegEx)[1]);
-          bed_temp = Number(data.match(bedTempRegEx)[1]);
-          bed_humidity = Number(data.match(bedHumRegEx)[1]);
-          flow_rate_1 = Number(data.match(flow_rate_1_Regex)[1]);
-          flow_rate_2 = Number(data.match(flow_rate_2_Regex)[1]);
-          water_level = Number(data.match(water_level_Regex)[1]);
-          water_level_etape = Number(data.match(water_level_etape_Regex)[1]);
-        } catch (err) {
-          // console.log(err)
-        }
-  	  }
-    });
+  nano.stderr.on('data', (data) => {
+    console.log(data.toString());
   });
-});
+
+  nano.on('exit', (data) => {
+    parseArduinoData();
+  });
+}
+
+parseArduinoData();
 
 // Create a new board object
 const board = new five.Board({
@@ -331,7 +315,9 @@ board.on('ready', function start() {
       });
 
       if (!_.isUndefined(water_temp)) {
-        this.emit('water_temperature', water_temp);
+        if (water_temp > 0) {
+          this.emit('water_temperature', water_temp);
+        }
 
         console.log('Water Temperature: ' + water_temp);
       }

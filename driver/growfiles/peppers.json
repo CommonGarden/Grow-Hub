@@ -1,0 +1,91 @@
+{
+    "name": "Chili Peppers",
+    "media": "Clay pebbles",
+    "protocol": {
+        "seeding": "Place seeds in tray space 2 inchees apart",
+        "pollination": "Get some bees",
+        "harvest": "Harvest the peppers."
+    },
+    "batch": "#1",
+    "temperature_threshold": 50,
+    "humidity_threshold": 100,
+    "targets": {
+        "water_temperature": {
+            "min": 17,
+            "max": 28
+        },
+        "co2": {
+            "min": 300,
+            "max": 5000
+        },
+        "humidity": {
+            "min": 40,
+            "ideal": 55,
+            "max": 80,
+            "pid": {
+                "k_p": 200,
+                "k_i": 0,
+                "k_d": 100,
+                "dt": 1
+            }
+        },
+        "ph": {
+            "min": 5.5,
+            "ideal": 6,
+            "max": 7,
+            "threshold": 200,
+            "pid": {
+                "k_p": 200,
+                "k_i": 0,
+                "k_d": 100,
+                "dt": 1
+            }
+        },
+        "ec": {
+            "min": 200,
+            "ideal": 800,
+            "max": 1500,
+            "threshold": 200,
+            "pid": {
+                "k_p": 20,
+                "k_i": 0,
+                "k_d": 10,
+                "dt": 1
+            }
+        }
+    },
+    "cycles": {
+        "day": {
+            "targets": {
+                "temperature": {
+                    "min": 17,
+                    "ideal": 24,
+                    "max": 28,
+                    "pid": {
+                        "k_p": 200,
+                        "k_i": 0,
+                        "k_d": 100,
+                        "dt": 1
+                    }
+                }
+            },
+            "schedule": "after 6:00pm"
+        },
+        "night": {
+            "targets": {
+                "temperature": {
+                    "min": 12,
+                    "ideal": 19,
+                    "max": 26,
+                    "pid": {
+                        "k_p": 200,
+                        "k_i": 0,
+                        "k_d": 100,
+                        "dt": 1
+                    }
+                }
+            },
+            "schedule": "after 10:00am"
+        }
+    }
+}

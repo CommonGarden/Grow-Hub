@@ -94,14 +94,14 @@ void setup()
 {
   Wire.begin(); //connects I2C
   Serial.begin(9600);
+
   //Lets read our Info from the eeprom and setup our params,
   //if we loose power or reset we'll still remember our settings!
   //first we load EC params
-      eeprom_read_block(&params_ec, (void *)0, sizeof(params_ec));
+  eeprom_read_block(&params_ec, (void *)0, sizeof(params_ec));
+
   //then pH param
   eeprom_read_block(&params_ph, (void *)0, sizeof(params_ph));
-
-  Serial.println(params_ph.pHStep);
 
   //if its a first time setup or our magic number in eeprom is wrong reset to default
   if (params_ec.WriteCheck != Write_Check){
@@ -169,7 +169,10 @@ void loop()
   //////////////// EC
 	int adcRaw = i2cADC.getData();
 	calcEc(adcRaw);
-  Serial.println(eC);
+  Serial.print("EC: ");
+  Serial.print(eC);
+  Serial.print(" | ");
+  Serial.println(adcRaw);
 }
 
 //////////////////////////////////////////////////////////////////////

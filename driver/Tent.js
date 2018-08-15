@@ -7,8 +7,8 @@ const five = require('johnny-five');
 const later = require('later');
 const _ = require('underscore');
 const spawn = require('child_process').spawn;
-const growfile_example = require('./simple-growfile.json');
-const types = require('./tent_types.js');
+const growfile_example = require('./growfiles/simple.json');
+const types = require('./Tent_types.js');
 
 // Use local time, not UTC.
 later.date.localTime();
@@ -38,7 +38,7 @@ const relays_nano = new five.Board();
 
 // Assign relays to pins on the NANO
 // We don't run them off the pi becase they require 5V pins
-relays.on('ready', function start() {
+relays_nano.on('ready', function start() {
     relay1 = new five.Pin(6);
     relay2 = new five.Pin(7);
     relay3 = new five.Pin(8);
@@ -52,40 +52,40 @@ relays.on('ready', function start() {
     };
 });
 
-// Kill the nano.js process if it is already running.
-// Otherwise USB sensor modules will not reconnect.
-spawn('pkill', ['-f', 'node nano.js']);
+// // Kill the nano.js process if it is already running.
+// // Otherwise USB sensor modules will not reconnect.
+// spawn('pkill', ['-f', 'node nano.js']);
 
-// Spawns nano.js process which reads values over serial from a USB sensor module
-let parseArduinoData = function () {
-    nano = spawn('node', ['nano.js']);
+// // Spawns nano.js process which reads values over serial from a USB sensor module
+// let parseArduinoData = function () {
+//     nano = spawn('node', ['nano.js']);
 
-    // TODO Parse PH, EC, and whatever is on the arduino
-    // PROBLEM: old compost brewer code had the relays on the arduino using Johnny-5 for interaction
-    // SOLUTION: use usbrelay or try running pins directly off pi.
-    nano.stdout.on('data', (data)=> {
-        try {
-            let parsedData = data.toString().split(" ");
-            temperature = Number(parsedData[0]) * 1.8 + 32;
-            currentHumidity = parsedData[2];
-            pressure = parsedData[4];
-            light_data = parsedData[5];
-        } catch (err) {
-            console.log(err);
-            nano.kill();
-        }
-    });
+//     // TODO Parse PH, EC, and whatever is on the arduino
+//     // PROBLEM: old compost brewer code had the relays on the arduino using Johnny-5 for interaction
+//     // SOLUTION: use usbrelay or try running pins directly off pi.
+//     nano.stdout.on('data', (data)=> {
+//         try {
+//             let parsedData = data.toString().split(" ");
+//             temperature = Number(parsedData[0]) * 1.8 + 32;
+//             currentHumidity = parsedData[2];
+//             pressure = parsedData[4];
+//             light_data = parsedData[5];
+//         } catch (err) {
+//             console.log(err);
+//             nano.kill();
+//         }
+//     });
 
-    nano.stderr.on('data', (data) => {
-        console.log(data.toString());
-    });
+//     nano.stderr.on('data', (data) => {
+//         console.log(data.toString());
+//     });
 
-    nano.on('exit', (data) => {
-        parseArduinoData();
-    });
-}
+//     nano.on('exit', (data) => {
+//         parseArduinoData();
+//     });
+// }
 
-parseArduinoData();
+// parseArduinoData();
 
 // Create a new board object
 const board = new five.Board({
@@ -104,7 +104,7 @@ board.on('ready', function start() {
             humidifier: 'off',
             light: 'off',
             duration: 2000,
-            interval: 100000,
+            interval: 10000,
             currently: null,
             types: types,
             growfile: growfile_example
@@ -134,18 +134,22 @@ board.on('ready', function start() {
             }, interval);
 
             let growfile = this.get('growfile');
-            this.startGrow(growfile);
 
-            this.on('correction', (key, correction)=> {
-                console.log(key, correction);
-                if (key === 'temerature') {
-                    // Handle temperature control
-                }
+            // Wait to start Growfile
+            setTimeout(()=> {
+                this.startGrow(growfile);
+            }, 5000);
 
-                if (key === 'humidity') {
-                    // Handle humidity control
-                }
-            });
+            // this.on('correction', (key, correction)=> {
+            //     console.log(key, correction);
+            //     if (key === 'temerature') {
+            //         // Handle temperature control
+            //     }
+
+            //     if (key === 'humidity') {
+            //         // Handle humidity control
+            //     }
+            // });
 
             this.emit('message', 'Running')
         },
@@ -175,7 +179,6 @@ board.on('ready', function start() {
             this.orp_data();
             this.do_data();
             this.ph_data();
-
             this.ec_data();
         },
 
@@ -247,52 +250,42 @@ board.on('ready', function start() {
         },
 
         relay1_on: function () {
-          let relay_name = this.get('relay1');
-          this.call('on', relay_name);
+            this.call('on', 'relay1');
         },
 
         relay1_off: function () {
-          let relay_name = this.get('relay1');
-          this.call('off', relay_name);
+            this.call('off', 'relay1');
         },
 
         relay2_on: function () {
-          let relay_name = this.get('relay2');
-          this.call('on', relay_name);
+            this.call('on', 'relay2');
         },
 
         relay2_off: function () {
-          let relay_name = this.get('relay2');
-          this.call('off', relay_name);
+            this.call('off', 'relay2');
         },
 
         relay3_on: function () {
-          let relay_name = this.get('relay3');
-          this.call('on', relay_name);
+            this.call('on', 'relay3');
         },
 
         relay3_off: function () {
-            let relay_name = this.get('relay3');
-            this.call('off', relay_name);
+            this.call('off', 'relay3');
         },
 
         relay4_on: function () {
-            let relay_name = this.get('relay4');
-            this.call('on', relay_name);
+            this.call('on', 'relay4');
         },
 
         relay4_off: function () {
-            let relay_name = this.get('relay4');
-            this.call('off', relay_name);
+            this.call('off', 'relay4');
         },
 
         on: function(relay) {
-            console.log(relay);
             relays[relay].low();
         },
 
         off: function(relay) {
-            console.log(relay);
             relays[relay].high();
         },
 

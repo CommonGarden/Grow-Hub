@@ -39,25 +39,36 @@ let temperature,
     relay_two,
     relay_three,
     relay_four,
-    relays;
+    relays,
+    relays_nano;
 
-const relays_nano = new five.Board();
+let path = '/dev/serial/by-path/';
 
-// Assign relays to pins on the NANO
-// We don't run them off the pi becase they require 5V pins
-relays_nano.on('ready', function start() {
-    relay1 = new five.Pin(6);
-    relay2 = new five.Pin(7);
-    relay3 = new five.Pin(8);
-    relay4 = new five.Pin(9);
+// Read the directory
+fs.readdir(path, (err, items)=> {
+    // We want the second arduino
+    path = path + items[1];
 
-    relays = {
-        relay1,
-        relay2,
-        relay3,
-        relay4
-    };
-});
+    relays_nano = new five.Board({
+        port: path
+    });
+
+    // Assign relays to pins on the NANO
+    // We don't run them off the pi becase they require 5V pins
+    relays_nano.on('ready', function start() {
+        relay1 = new five.Pin(6);
+        relay2 = new five.Pin(7);
+        relay3 = new five.Pin(8);
+        relay4 = new five.Pin(9);
+
+        relays = {
+            relay1,
+            relay2,
+            relay3,
+            relay4
+        };
+    });
+})
 
 // Kill the nano.js process if it is already running.
 // Otherwise USB sensor modules will not reconnect.
@@ -70,17 +81,16 @@ let parseArduinoData = function () {
     nano.stdout.on('data', (data)=> {
         try {
             let parsedData = data.toString().split(" ");
-            console.log(parsedData);
             temperature = parsedData[0];
             currentHumidity = parsedData[1];
-            pressure = parsedData[2];
-            light_data = parsedData[3];
-            env_temp = parsedData[4];
-            water_temp = parsedData[5];
-            water_temp_on_ph = parsedData[6];
-            pH_reading = parsedData[7];
-            eC_reading = parsedData[8];
-            water_level = parsedData[9];
+            pressure = parsedData[3];
+            light_data = parsedData[4];
+            env_temp = parsedData[5];
+            water_temp = parsedData[6];
+            water_temp_on_ph = parsedData[7];
+            pH_reading = parsedData[8];
+            eC_reading = parsedData[9];
+            water_level = parsedData[10];
         } catch (err) {
             console.log(err);
             nano.kill();

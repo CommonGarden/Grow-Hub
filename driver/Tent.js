@@ -9,6 +9,7 @@ const _ = require('underscore');
 const spawn = require('child_process').spawn;
 const growfile_example = require('./growfiles/simple.json');
 const types = require('./Tent_types.js');
+const fs = require('fs');
 
 // Use local time, not UTC.
 later.date.localTime();

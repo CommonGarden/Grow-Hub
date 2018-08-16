@@ -172,6 +172,18 @@ board.on('ready', function start() {
         },
 
         fire: function () {
+            let process = spawn('python', ['python/BME280/read_BME280.py']);
+
+            process.stdout.on('data', (data)=> {
+                data = data.toString().split(' ');
+                temperature = Number(data[0]).toFixed(2);
+                currentHumidity = Number(data[1]).toFixed(2);
+                pressure = Number(data[2]).toFixed(2);
+                this.temp_data();
+                this.hum_data();
+                this.pressure_data();
+            });
+
             this.temp_data();
             this.hum_data();
             this.air_pressure_data();

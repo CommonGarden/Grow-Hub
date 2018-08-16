@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//ENV-TMP (analog pin A0) 
+//ENV-TMP (analog pin A0)
 //  //// TO ADD: ////  WLSENS (eTape) (analog pins A2,A3) (10' 22/4 cable)
-//BME280 (i2c pins A4,A5) 
-//TSL2561 (i2c pins A4,A5) 
+//BME280 (i2c pins A4,A5)
+//TSL2561 (i2c pins A4,A5)
 //pH (analog pH out (Po) pin A6, analog temp out (T1) pin A7, digital temp DS18B20 (T2) pin 10)
-//  ////MAY TRANSFER TO OTHER NANO: /// 4ch YWR relay (inverted signalling) (pins 6,7,8,9) (lights, humidifier, fan, ...) 
-//DS18B20 (1-wire pin 12) 
+//  ////MAY TRANSFER TO OTHER NANO: /// 4ch YWR relay (inverted signalling) (pins 6,7,8,9) (lights, humidifier, fan, ...)
+//DS18B20 (1-wire pin 12)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <Wire.h>
@@ -25,7 +25,7 @@
 #define tmpPIN A0
 float temp;                     //where the final ENV-TMP temperature data is stored
 
-// eTape water level 
+// eTape water level
 #define WLrefPIN A2            //eTape water level reference signal pin
 #define WLsensPIN A3             //eTape water level sensor signal pin
 int WLsensREAD = 0;             //placeholder for eTape water level sensor readings
@@ -45,7 +45,7 @@ float pHLM35;
 #define relay3PIN 8
 #define relay4PIN 9
 // placeholder for incoming serial data
-int incomingByte;                                       
+int incomingByte;
 
 
 // Dallas data wire on the nano
@@ -58,7 +58,7 @@ int incomingByte;
 OneWire oneWire1(pHdigitempPIN);
 OneWire oneWire2(ONE_WIRE_BUS2);
 
-// Pass our oneWire reference to Dallas Temperature. 
+// Pass our oneWire reference to Dallas Temperature.
 DallasTemperature sensors1(&oneWire1);
 DallasTemperature sensors2(&oneWire2);
 
@@ -78,7 +78,7 @@ unsigned long delayTime;
 
 /* This driver uses the Adafruit unified sensor library (Adafruit_Sensor),
    which provides a common 'type' for sensor data and some helper functions.
-   
+
    To use this driver you will also need to download the Adafruit_Sensor
    library and include it in your libraries folder.
 
@@ -87,7 +87,7 @@ unsigned long delayTime;
    sensor in any data logs, etc.  To assign a unique ID, simply
    provide an appropriate value in the constructor below (12345
    is used by default in this example).
-   
+
    Connections
    ===========
    Connect SCL to analog 5
@@ -98,19 +98,19 @@ unsigned long delayTime;
    I2C Address
    ===========
    The address will be different depending on whether you leave
-   the ADDR pin floating (addr 0x39), or tie it to ground or vcc. 
+   the ADDR pin floating (addr 0x39), or tie it to ground or vcc.
    The default addess is 0x39, which assumes the ADDR pin is floating
    (not connected to anything).  If you set the ADDR pin high
    or low, use TSL2561_ADDR_HIGH (0x49) or TSL2561_ADDR_LOW
    (0x29) respectively.
-    
+
    History
    =======
    2013/JAN/31  - First version (KTOWN)
 */
 
 //unsigned long delayTime;
-   
+
 Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 12345);
 
 
@@ -132,7 +132,7 @@ void displaySensorDetails(void)
   Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
   Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" lux");
   Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" lux");
-  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" lux");  
+  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" lux");
   Serial.println("------------------------------------");
   Serial.println("");
   */
@@ -151,13 +151,13 @@ void configureSensor(void)
   // tsl.setGain(TSL2561_GAIN_1X);      /* No gain ... use in bright light to avoid sensor saturation */
   // tsl.setGain(TSL2561_GAIN_16X);     /* 16x gain ... use in low light to boost sensitivity */
   tsl.enableAutoRange(true);            /* Auto-gain ... switches automatically between 1x and 16x */
-  
+
   /* Changing the integration time gives you better sensor resolution (402ms = 16-bit data) */
   tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_13MS);      /* fast but low resolution */
   // tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_101MS);  /* medium resolution and speed   */
   // tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_402MS);  /* 16-bit data but slowest conversions */
 
-  /* Update these values depending on what you've set above! */  
+  /* Update these values depending on what you've set above! */
   /*
   Serial.println("------------------------------------");
   Serial.print  ("Gain:         "); Serial.println("Auto");
@@ -170,20 +170,20 @@ void configureSensor(void)
 
 void setup() {    //main loop
 
-  pinMode(relay1PIN, OUTPUT);  
-  pinMode(relay2PIN, OUTPUT);  
-  pinMode(relay3PIN, OUTPUT);  
-  pinMode(relay4PIN, OUTPUT); 
+  pinMode(relay1PIN, OUTPUT);
+  pinMode(relay2PIN, OUTPUT);
+  pinMode(relay3PIN, OUTPUT);
+  pinMode(relay4PIN, OUTPUT);
   digitalWrite(relay1PIN, HIGH);
-  digitalWrite(relay2PIN, HIGH);   
+  digitalWrite(relay2PIN, HIGH);
   digitalWrite(relay3PIN, HIGH);
   digitalWrite(relay4PIN, HIGH);
- 
-      
+
+
   Serial.begin(9600);       //set up the hardware serial port to run at 9600
 
   //Serial.println("Light Sensor Test"); Serial.println("");
-  
+
   /* Initialise the sensor */
   if(!tsl.begin())
   {
@@ -191,17 +191,17 @@ void setup() {    //main loop
     Serial.print("Ooops, no TSL2561 detected ... Check your wiring or I2C ADDR!");
     while(1);
   }
-  
+
   /* Display some basic information on the light sensor */
   displaySensorDetails();
-  
+
   /* Setup the sensor gain and integration time */
   configureSensor();
-  
+
   /* We're ready to go! */
   //Serial.println("");
 
-    
+
   //Serial.println(F("BME280 test"));
   bool status;
   // default settings
@@ -218,14 +218,14 @@ void setup() {    //main loop
   // Start up the Dallas library
   sensors1.begin();
   sensors2.begin();
-  
+
   // Grab a count of devices on the wire
   numberOfDevices1 = sensors1.getDeviceCount();
   numberOfDevices2 = sensors2.getDeviceCount();
 
   // locate devices on the bus
   Serial.print("Locating devices...");
-  
+
   Serial.print("Found ");
   Serial.print(numberOfDevices1, DEC);
   Serial.print(" on bus1, and: ");
@@ -234,15 +234,15 @@ void setup() {    //main loop
 
 
   // report parasite power requirements
-  Serial.print("Parasite power on bus1 is: "); 
+  Serial.print("Parasite power on bus1 is: ");
   if (sensors1.isParasitePowerMode()) Serial.println("ON");
   else Serial.println("OFF");
 
-  Serial.print("Parasite power on bus2 is: "); 
+  Serial.print("Parasite power on bus2 is: ");
   if (sensors2.isParasitePowerMode()) Serial.println("ON");
   else Serial.println("OFF");
 
-  
+
   // Loop through each device, print out address
   for(int i=0;i<numberOfDevices1; i++)
   {
@@ -254,21 +254,21 @@ void setup() {    //main loop
         Serial.print(" with address: ");
         printAddress(tempDeviceAddress1);
         Serial.println();
-       
+
         Serial.print("Setting resolution to ");
         Serial.println(TEMPERATURE_PRECISION1, DEC);
-        
+
         // set the resolution to TEMPERATURE_PRECISION bit (Each Dallas/Maxim device is capable of several different resolutions)
         sensors1.setResolution(tempDeviceAddress1, TEMPERATURE_PRECISION1);
-        
+
         Serial.print("Resolution actually set to: ");
-        Serial.print(sensors1.getResolution(tempDeviceAddress1), DEC); 
+        Serial.print(sensors1.getResolution(tempDeviceAddress1), DEC);
         Serial.println();
       }else{
         Serial.print("Found ghost device at ");
         Serial.print(i, DEC);
         Serial.print(" but could not detect address. Check power and cabling");
-      }   
+      }
   }
   // Loop through each device, print out address
   for(int i=0;i<numberOfDevices2; i++)
@@ -281,24 +281,24 @@ void setup() {    //main loop
         Serial.print(" with address: ");
         printAddress(tempDeviceAddress2);
         Serial.println();
-       
+
         Serial.print("Setting resolution to ");
         Serial.println(TEMPERATURE_PRECISION2, DEC);
-        
+
         // set the resolution to TEMPERATURE_PRECISION bit (Each Dallas/Maxim device is capable of several different resolutions)
         sensors2.setResolution(tempDeviceAddress2, TEMPERATURE_PRECISION2);
-        
+
         Serial.print("Resolution actually set to: ");
-        Serial.print(sensors2.getResolution(tempDeviceAddress2), DEC); 
+        Serial.print(sensors2.getResolution(tempDeviceAddress2), DEC);
         Serial.println();
       }else{
         Serial.print("Found ghost device at ");
         Serial.print(i, DEC);
         Serial.print(" but could not detect address. Check power and cabling");
-      }   
+      }
   }
 
-  
+
 }
 
 
@@ -324,9 +324,9 @@ void loop() {
   Serial.print(WLsensREAD);
   Serial.print(" Reference: ");
   Serial.println(WLrefREAD);
-  
+
   delay(100);
-  
+
   pHanalog = analogRead(pHanalogPIN);
   Serial.print("pH Analog Raw Reading: ");
   Serial.println(pHanalog);
@@ -335,7 +335,7 @@ void loop() {
   Serial.println(pHmapped);
   pHLM35 = analogRead(pHLM35PIN);
   Serial.print("pH Analog Temperature: ");
-  Serial.println(pHLM35);  
+  Serial.println(pHLM35);
 
 
   // call sensors.requestTemperatures() to issue a global temperature request to all devices on the bus
@@ -354,13 +354,13 @@ void loop() {
       // Output the device ID
       //Serial.print("Water temperature (DS18B20 on pH): ");
       //Serial.println(i,DEC);
-      
+
       // It responds almost immediately. Let's print out the data
       printTemperature1(tempDeviceAddress1); // Use a simple function to print out the data
-    } 
+    }
   //else ghost device! Check your power requirements and cabling
   }
-  
+
   for(int i=0; i<numberOfDevices2; i++)
   {
     // Search the wire for address
@@ -369,32 +369,32 @@ void loop() {
       // Output the device ID
       //Serial.print("Water temperature (pin-12 DS18B20): ");
       //Serial.println(i,DEC);
-      
+
       // It responds almost immediately. Let's print out the data
       printTemperature2(tempDeviceAddress2); // Use a simple function to print out the data
-    } 
+    }
   //else ghost device! Check your power requirements and cabling
   }
-  
+
 
   printValues();           //read & print bme280 data
   delay(delayTime);
 
-  
-  /* Get a new sensor event */ 
+
+  /* Get a new sensor event */
   sensors_event_t event;
   tsl.getEvent(&event);
 
   Serial.print("Ambient Light (TSL2561): ");
-  Serial.print(event.light); 
+  Serial.print(event.light);
   Serial.println(" lux");
- 
+
   /*
-  // Display the results (light is measured in lux) 
+  // Display the results (light is measured in lux)
   if (event.light)
   {
     Serial.print("Ambient Light (TSL2561): ");
-    Serial.print(event.light); 
+    Serial.print(event.light);
     Serial.println(" lux");
   }
   else
@@ -405,19 +405,19 @@ void loop() {
   }
   */
 
-  
+
   //delay(2500);
 
   // Wait between measurements before retrieving the result
   // (You can also configure the sensor to issue an interrupt
   // when measurements are complete)
-  
+
   // This sketch uses the TSL2561's built-in integration timer.
   // You can also perform your own manual integration timing
   // by setting "time" to 3 (manual) in setTiming(),
   // then performing a manualStart() and a manualStop() as in the below
   // commented statements:
-  
+
   // ms = 1000;
   // light.manualStart();
 
@@ -428,7 +428,7 @@ void loop() {
   //   use getErrorCode() to check for cause of error.
 
 
- 
+
   if (Serial.available() > 0) {
     // read the oldest byte in the serial buffer:
     incomingByte = Serial.read();
@@ -440,7 +440,7 @@ void loop() {
     if (incomingByte == 'a') {
       digitalWrite(relay1PIN, HIGH);
     }
-    
+
     // if it's a 'w' turn on ch2:
     if (incomingByte == 'w') {
       digitalWrite(relay2PIN, LOW);
@@ -466,15 +466,15 @@ void loop() {
     // if it's an 'f' turn off ch4:
     if (incomingByte == 'f') {
       digitalWrite(relay4PIN, HIGH);
-    }        
-  }    
-  
+    }
+  }
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 float read_temp(void) {    //ENV-TMP temperature-read function
-  float v_out;             //voltage output from temp sensor 
+  float v_out;             //voltage output from temp sensor
   float temp;              //the final temperature is stored here
   digitalWrite(tmpPIN, LOW);   //set pull-up on analog pin
   //digitalWrite(2, HIGH); //set pin 2 high, this will turn on temp sensor

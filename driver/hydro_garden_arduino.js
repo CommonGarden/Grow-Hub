@@ -20,10 +20,10 @@ const fs = require('fs');
 
 let path = '/dev/serial/by-path/';
 
-// Read the directory
 fs.readdir(path, function(err, items) {
-  // We want the first arduino
-  path = path + items[0];
+  for (var i=0; i<items.length; i++) {
+    path = path + items[i];
+  }
 
   const portName = process.env.PORT || path;
 

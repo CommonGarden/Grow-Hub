@@ -51,14 +51,11 @@ const fs = require('fs');
 
 let path = '/dev/serial/by-path/';
 
+
+// Read the directory
 fs.readdir(path, function(err, items) {
-    for (var i=0; i<items.length; i++) {
-        console.log(items[i]);
-        // TODO figure out how to differentiate between the two arduinos...
-        // For the purpose of the demo we can just hard code it. I imagine the names might change but the order
-        // stay in relation to the order they are plugged into the USB port.
-        path = path + items[i];
-    }
+    // We want the first arduino
+    path = path + items[0];
 
     const portName = process.env.PORT || path;
 

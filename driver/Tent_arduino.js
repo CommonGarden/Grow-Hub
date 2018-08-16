@@ -1,3 +1,27 @@
+/*
+
+Serial format:
+
+Water Temperature (ENV-TMP): 49.53
+Water Level: 280 Reference: 264
+pH Analog Raw Reading: 870.00
+pH Analog Mapped: 3.00
+pH Analog Temperature: 160.00
+Water Temperature (DS18B20 on pH): 24.50 *C 76.10
+Water Temperat⸮Locating devices...Found 1 on bus1, and: 1 on bus2.
+Parasite power on bus1 is: OFF
+Parasite power on bus2 is: OFF
+Found device 0 with address: 28FFA47F62160318
+Setting resolution to 9
+Resolution actually set to: 9
+Found device 0 with address: 283BD771040000BD
+Setting resolution to 9
+Resolution actually set to: 9
+pH: 6.66 | 2067
+EC: 3918.64 | 105
+
+*/
+
 // Connects to Arduino nano over USB (serial) and parses repsonse.
 const serialport = require('serialport');
 const fs = require('fs');

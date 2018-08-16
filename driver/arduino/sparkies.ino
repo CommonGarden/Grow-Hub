@@ -51,6 +51,23 @@
 // pH address
 #define ADDRESS 0x48
 
+// pH Variables
+float pH;
+const float vRef = 4.096; //Our vRef into the ADC wont be exact
+//Since you can run VCC lower than Vref its
+//best to measure and adjust here
+const float opampGain = 5.25; //what is our Op-Amps gain (stage 1)
+
+//Our pH parameter, for ease of use and eeprom access lets use a struct
+struct parameters_H
+{
+  unsigned int WriteCheck;
+  int pH7Cal, pH4Cal;
+  float pHStep;
+}
+  params_ph;
+
+// EC Variables
 // EC address
 byte i2cAddress = 0x4C;
 
@@ -63,25 +80,6 @@ struct parameters_T
 }
   params_ec;
 
-
-//Our pH parameter, for ease of use and eeprom access lets use a struct
-struct parameters_H
-{
-  unsigned int WriteCheck;
-  int pH7Cal, pH4Cal;
-  float pHStep;
-}
-  params_ph;
-
-// pH Variables
-float pH;
-const float vRef = 4.096; //Our vRef into the ADC wont be exact
-//Since you can run VCC lower than Vref its
-//best to measure and adjust here
-const float opampGain = 5.25; //what is our Op-Amps gain (stage 1)
-
-
-// EC Variables
 float eC, temperatute;
 const int I2CadcVRef = 4948;
 const int oscV = 185; //voltage of oscillator output after voltage divider in millivolts i.e 120mV (measured AC RMS) ideal output is about 180-230mV range

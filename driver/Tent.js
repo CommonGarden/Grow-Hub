@@ -24,6 +24,9 @@ let temperature,
     emit_data,
     light_data,
     water_temp,
+    water_temp_on_ph,
+    env_temp,
+    water_level,
     fan,
     humidifier,
     light,
@@ -52,40 +55,44 @@ relays_nano.on('ready', function start() {
     };
 });
 
-// // Kill the nano.js process if it is already running.
-// // Otherwise USB sensor modules will not reconnect.
-// spawn('pkill', ['-f', 'node nano.js']);
+// Kill the nano.js process if it is already running.
+// Otherwise USB sensor modules will not reconnect.
+spawn('pkill', ['-f', 'node Tent_arduino.js']);
 
-// // Spawns nano.js process which reads values over serial from a USB sensor module
-// let parseArduinoData = function () {
-//     nano = spawn('node', ['nano.js']);
+// Spawns nano.js process which reads values over serial from a USB sensor module
+let parseArduinoData = function () {
+    nano = spawn('node', ['Tent_arduino.js']);
 
-//     // TODO Parse PH, EC, and whatever is on the arduino
-//     // PROBLEM: old compost brewer code had the relays on the arduino using Johnny-5 for interaction
-//     // SOLUTION: use usbrelay or try running pins directly off pi.
-//     nano.stdout.on('data', (data)=> {
-//         try {
-//             let parsedData = data.toString().split(" ");
-//             temperature = Number(parsedData[0]) * 1.8 + 32;
-//             currentHumidity = parsedData[2];
-//             pressure = parsedData[4];
-//             light_data = parsedData[5];
-//         } catch (err) {
-//             console.log(err);
-//             nano.kill();
-//         }
-//     });
+    nano.stdout.on('data', (data)=> {
+        try {
+            let parsedData = data.toString().split(" ");
+            console.log(parsedData);
+            temperature = parsedData[0];
+            currentHumidity = parsedData[1];
+            pressure = parsedData[2];
+            light_data = parsedData[3];
+            env_temp = parsedData[4];
+            water_temp = parsedData[5];
+            water_temp_on_ph = parsedData[6];
+            pH_reading = parsedData[7];
+            eC_reading = parsedData[8];
+            water_level = parsedData[9];
+        } catch (err) {
+            console.log(err);
+            nano.kill();
+        }
+    });
 
-//     nano.stderr.on('data', (data) => {
-//         console.log(data.toString());
-//     });
+    nano.stderr.on('data', (data) => {
+        console.log(data.toString());
+    });
 
-//     nano.on('exit', (data) => {
-//         parseArduinoData();
-//     });
-// }
+    nano.on('exit', (data) => {
+        parseArduinoData();
+    });
+}
 
-// parseArduinoData();
+parseArduinoData();
 
 // Create a new board object
 const board = new five.Board({
@@ -105,6 +112,7 @@ board.on('ready', function start() {
             light: 'off',
             duration: 2000,
             interval: 10000,
+            picture_interval: 100000,
             currently: null,
             types: types,
             growfile: growfile_example
@@ -126,6 +134,13 @@ board.on('ready', function start() {
                 let ORP = Number(this.parseAsciiResponse(bytes));
                 if (ORP) orp_reading = ORP;
             });
+
+            var picture_interval = this.get('picture_interval');
+            camera_interval = setInterval(()=> {
+                this.picture();
+            }, picture_interval);
+
+            this.picture();
 
             var interval = this.get('interval');
             this.fire();
@@ -184,6 +199,11 @@ board.on('ready', function start() {
                 this.pressure_data();
             });
 
+            if (water_level) this.emit('water_level', water_level);
+            if (env_temp) this.emit('env_temp', env_temp);
+            if (water_temp) this.emit('water_temp', water_temp);
+            if (water_temp_on_ph) this.emit('water_temp_on_ph', water_temp_on_ph);
+
             this.temp_data();
             this.hum_data();
             this.air_pressure_data();
@@ -194,7 +214,20 @@ board.on('ready', function start() {
             this.ec_data();
         },
 
-        // TODO the relays for this module are powered off the arduino.
+        picture: function () {
+            let takePic = spawn('raspistill', ['-o', 'image.jpg', '-q', '10'])
+            // wait for image to be saved, before reading it.
+            setTimeout(()=> {
+                fs.readFile('./image.jpg', (err, data) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        this.sendImage(data);
+                    }
+                });
+            }, 3000);
+        },
+
         turn_on: function (type) {
             let types = this.get('types');
             let outlets = types.actuators;

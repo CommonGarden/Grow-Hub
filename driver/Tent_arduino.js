@@ -16,22 +16,6 @@
   Relative Humidity (BME280): 49.90 %
   Ambient Light (TSL2561): 69.00 lux
   Water level (float): OKAY
-
-  pH: -6.16 | 3071
-  EC: 203.42 | 42
-  Water Temperature (ENV-TMP): 31.83 *C
-  Water Level: 231 Reference: 228
-  pH Analog Raw Reading: 756.00
-  pH Analog Mapped: 4.00
-  pH Analog Temperature: 155.00
-  Water Temperature (DS18B20 on pH): 24.00 *C 75.20 *F
-  Water Temperature (pin-12 DS18B20): 23.50 *C 74.30 *F
-  Air Temperature (BME280): 25.27 *C
-  Air Pressure (BME280): 1013.82 hPa
-  Relative Humidity (BME280): 49.96 %
-  Ambient Light (TSL2561): 66.00 lux
-  Water level (float): LOW
-
 */
 
 
@@ -49,8 +33,6 @@
 // Relative Humidity (BME280): 49.90 %
 // Ambient Light (TSL2561): 69.00 lux
 // Water level (float): OKAY`;
-
-// console.log(data);
 
 let temp,
     humidity,
@@ -85,8 +67,6 @@ fs.readdir(path, function(err, items) {
     const sp = new serialport(portName, {
         baudRate: 9600,
     });
-
-    let temp, humidity, pressure, lux;
 
     sp.on('open', function(){
         let string = [];

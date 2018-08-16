@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //// CONNECTED SENSORS: ////
-//ENV-TMP (analog pin A0) 
-//// TO ADD: //// WLSENS (eTape) (analog pins A2,A3) (10' 22/4 cable) 
-//BME280 (i2c pins A4,A5) 
-//TSL2561 (i2c pins A4,A5) 
+//ENV-TMP (analog pin A0)
+//// TO ADD: //// WLSENS (eTape) (analog pins A2,A3) (10' 22/4 cable)
+//BME280 (i2c pins A4,A5)
+//TSL2561 (i2c pins A4,A5)
 //Sparky's pH (i2c pins A4,A5)
 //Sparky's EC (i2c pins A4,A5)
-//pH (analog pH out (Po) pin A6, analog temp out (T1) pin A7, digital temp DS18B20 (T2) pin 10) 
+//pH (analog pH out (Po) pin A6, analog temp out (T1) pin A7, digital temp DS18B20 (T2) pin 10)
 //float sensor (binary hi-lo) (digital read pin 4)
 //DS18B20 (1-wire pin 12)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -500,7 +500,6 @@ void loop() {
     }
   //else ghost device! Check your power requirements and cabling
   }
-  
 
   printValues();           //read & print bme280 data
   delay(delayTime);

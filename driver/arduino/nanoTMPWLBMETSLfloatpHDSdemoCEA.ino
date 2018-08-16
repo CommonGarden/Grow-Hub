@@ -4,7 +4,7 @@
 //BME280 (i2c pins A4,A5) 
 //TSL2561 (i2c pins A4,A5) 
 //pH (analog pH out (Po) pin A6, analog temp out (T1) pin A7, digital temp DS18B20 (T2) pin 10)
-//float sensor (binary hi-lo) (digital read pin 2)
+//float sensor (binary hi-lo) (digital read pin 4)
 //DS18B20 (1-wire pin 12) 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -442,20 +442,20 @@ float read_temp(void) {    //ENV-TMP temperature-read function
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void printValues() {
-    Serial.print("Air Temperature (BME280) = ");
+    Serial.print("Air Temperature (BME280): ");
     Serial.print(bme.readTemperature());
     Serial.println(" *C");
 
-    Serial.print("Air Pressure (BME280) = ");
+    Serial.print("Air Pressure (BME280): ");
 
     Serial.print(bme.readPressure() / 100.0F);
     Serial.println(" hPa");
 
-    //Serial.print("Approximate Altitude = ");
+    //Serial.print("Approximate Altitude: ");
     //Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
     //Serial.println(" m");
 
-    Serial.print("Relative Humidity (BME280) = ");
+    Serial.print("Relative Humidity (BME280): ");
     Serial.print(bme.readHumidity());
     Serial.println(" %");
 

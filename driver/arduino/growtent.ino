@@ -265,22 +265,22 @@ void setup() {    //main loop
   numberOfDevices2 = sensors2.getDeviceCount();
 
   // locate devices on the bus
-  /* Serial.print("Locating devices..."); */
+  Serial.print("Locating devices...");
 
-  /* Serial.print("Found "); */
-  /* Serial.print(numberOfDevices1, DEC); */
-  /* Serial.print(" on bus1, and: "); */
-  /* Serial.print(numberOfDevices2, DEC); */
-  /* Serial.println(" on bus2."); */
+  Serial.print("Found ");
+  Serial.print(numberOfDevices1, DEC);
+  Serial.print(" on bus1, and: ");
+  Serial.print(numberOfDevices2, DEC);
+  Serial.println(" on bus2.");
 
-  /* // report parasite power requirements */
-  /* Serial.print("Parasite power on bus1 is: "); */
-  /* if (sensors1.isParasitePowerMode()) Serial.println("ON"); */
-  /* else Serial.println("OFF"); */
+  // report parasite power requirements
+  Serial.print("Parasite power on bus1 is: ");
+  if (sensors1.isParasitePowerMode()) Serial.println("ON");
+  else Serial.println("OFF");
 
-  /* Serial.print("Parasite power on bus2 is: "); */
-  /* if (sensors2.isParasitePowerMode()) Serial.println("ON"); */
-  /* else Serial.println("OFF"); */
+  Serial.print("Parasite power on bus2 is: ");
+  if (sensors2.isParasitePowerMode()) Serial.println("ON");
+  else Serial.println("OFF");
 
   // Loop through each device, print out address
   for(int i=0;i<numberOfDevices1; i++)
@@ -288,25 +288,25 @@ void setup() {    //main loop
       // Search the wire for address
       if(sensors1.getAddress(tempDeviceAddress1, i))
       {
-        /* Serial.print("Found device "); */
-        /* Serial.print(i, DEC); */
-        /* Serial.print(" with address: "); */
-        /* printAddress(tempDeviceAddress1); */
-        /* Serial.println(); */
+        Serial.print("Found device ");
+        Serial.print(i, DEC);
+        Serial.print(" with address: ");
+        printAddress(tempDeviceAddress1);
+        Serial.println();
 
-        /* Serial.print("Setting resolution to "); */
-        /* Serial.println(TEMPERATURE_PRECISION1, DEC); */
+        Serial.print("Setting resolution to ");
+        Serial.println(TEMPERATURE_PRECISION1, DEC);
 
         // set the resolution to TEMPERATURE_PRECISION bit (Each Dallas/Maxim device is capable of several different resolutions)
         sensors1.setResolution(tempDeviceAddress1, TEMPERATURE_PRECISION1);
 
-        /* Serial.print("Resolution actually set to: "); */
-        /* Serial.print(sensors1.getResolution(tempDeviceAddress1), DEC); */
-        /* Serial.println(); */
+        Serial.print("Resolution actually set to: ");
+        Serial.print(sensors1.getResolution(tempDeviceAddress1), DEC);
+        Serial.println();
       }else{
-        /* Serial.print("Found ghost device at "); */
-        /* Serial.print(i, DEC); */
-        /* Serial.print(" but could not detect address. Check power and cabling"); */
+        Serial.print("Found ghost device at ");
+        Serial.print(i, DEC);
+        Serial.print(" but could not detect address. Check power and cabling");
       }
   }
   // Loop through each device, print out address
@@ -315,25 +315,25 @@ void setup() {    //main loop
       // Search the wire for address
       if(sensors2.getAddress(tempDeviceAddress2, i))
       {
-        /* Serial.print("Found device "); */
-        /* Serial.print(i, DEC); */
-        /* Serial.print(" with address: "); */
-        /* printAddress(tempDeviceAddress2); */
-        /* Serial.println(); */
+        Serial.print("Found device ");
+        Serial.print(i, DEC);
+        Serial.print(" with address: ");
+        printAddress(tempDeviceAddress2);
+        Serial.println();
 
-        /* Serial.print("Setting resolution to "); */
-        /* Serial.println(TEMPERATURE_PRECISION2, DEC); */
+        Serial.print("Setting resolution to ");
+        Serial.println(TEMPERATURE_PRECISION2, DEC);
 
         // set the resolution to TEMPERATURE_PRECISION bit (Each Dallas/Maxim device is capable of several different resolutions)
         sensors2.setResolution(tempDeviceAddress2, TEMPERATURE_PRECISION2);
 
-        /* Serial.print("Resolution actually set to: "); */
-        /* Serial.print(sensors2.getResolution(tempDeviceAddress2), DEC); */
-        /* Serial.println(); */
+        Serial.print("Resolution actually set to: ");
+        Serial.print(sensors2.getResolution(tempDeviceAddress2), DEC);
+        Serial.println();
       }else{
-        /* Serial.print("Found ghost device at "); */
-        /* Serial.print(i, DEC); */
-        /* Serial.print(" but could not detect address. Check power and cabling"); */
+        Serial.print("Found ghost device at ");
+        Serial.print(i, DEC);
+        Serial.print(" but could not detect address. Check power and cabling");
       }
   }
 
@@ -428,7 +428,7 @@ void loop() {
   Serial.print(" | ");
   Serial.println(adcRaw);
 
-  Serial.println();
+  /* Serial.println(); */
   temp = read_temp();       //call the ENV-TMP function “read_temp” and return the temperature in C°
   Serial.print("Water Temperature (ENV-TMP): ");
   Serial.println(temp);     //print the temperature data
@@ -456,40 +456,40 @@ void loop() {
   Serial.println(pHLM35);
 
 
-  /* // call sensors.requestTemperatures() to issue a global temperature request to all devices on the bus */
-  /* sensors1.requestTemperatures(); // Send the command to get temperatures */
-  /* sensors2.requestTemperatures(); // Send the command to get temperatures */
+  // call sensors.requestTemperatures() to issue a global temperature request to all devices on the bus
+  sensors1.requestTemperatures(); // Send the command to get temperatures
+  sensors2.requestTemperatures(); // Send the command to get temperatures
 
-  /* // Loop through each device, print out temperature data */
-  /* for(int i=0; i<numberOfDevices1; i++) */
-  /* { */
-  /*   // Search the wire for address */
-  /*   if(sensors1.getAddress(tempDeviceAddress1, i)) */
-  /*   { */
-  /*     // Output the device ID */
-  /*     //Serial.print("Water temperature (DS18B20 on pH): "); */
-  /*     //Serial.println(i,DEC); */
+  // Loop through each device, print out temperature data
+  for(int i=0; i<numberOfDevices1; i++)
+  {
+    // Search the wire for address
+    if(sensors1.getAddress(tempDeviceAddress1, i))
+    {
+      // Output the device ID
+      //Serial.print("Water temperature (DS18B20 on pH): ");
+      //Serial.println(i,DEC);
 
-  /*     // It responds almost immediately. Let's print out the data */
-  /*     printTemperature1(tempDeviceAddress1); // Use a simple function to print out the data */
-  /*   } */
-  /* //else ghost device! Check your power requirements and cabling */
-  /* } */
+      // It responds almost immediately. Let's print out the data
+      printTemperature1(tempDeviceAddress1); // Use a simple function to print out the data
+    }
+  //else ghost device! Check your power requirements and cabling
+  }
 
-  /* for(int i=0; i<numberOfDevices2; i++) */
-  /* { */
-  /*   // Search the wire for address */
-  /*   if(sensors2.getAddress(tempDeviceAddress2, i)) */
-  /*   { */
-  /*     // Output the device ID */
-  /*     //Serial.print("Water temperature (pin-12 DS18B20): "); */
-  /*     //Serial.println(i,DEC); */
+  for(int i=0; i<numberOfDevices2; i++)
+  {
+    // Search the wire for address
+    if(sensors2.getAddress(tempDeviceAddress2, i))
+    {
+      // Output the device ID
+      //Serial.print("Water temperature (pin-12 DS18B20): ");
+      //Serial.println(i,DEC);
 
-  /*     // It responds almost immediately. Let's print out the data */
-  /*     printTemperature2(tempDeviceAddress2); // Use a simple function to print out the data */
-  /*   } */
-  /* //else ghost device! Check your power requirements and cabling */
-  /* } */
+      // It responds almost immediately. Let's print out the data
+      printTemperature2(tempDeviceAddress2); // Use a simple function to print out the data
+    }
+  //else ghost device! Check your power requirements and cabling
+  }
 
   Serial.print("Air Temperature (BME280) = ");
   Serial.print(bme.readTemperature());
@@ -508,8 +508,8 @@ void loop() {
   Serial.print(bme.readHumidity());
   Serial.println(" %");
 
-  /* printValues();           //read & print bme280 data */
-  /* delay(delayTime); */
+  printValues();           //read & print bme280 data
+  delay(delayTime);
 
 
   /* Get a new sensor event */
@@ -587,11 +587,11 @@ float read_temp(void) {    //ENV-TMP temperature-read function
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void printValues() {
-    Serial.print("Air Temperature (BME280) = ");
+    Serial.print("Air Temperature (BME280): ");
     Serial.print(bme.readTemperature());
     Serial.println(" *C");
 
-    Serial.print("Air Pressure (BME280) = ");
+    Serial.print("Air Pressure (BME280): ");
 
     Serial.print(bme.readPressure() / 100.0F);
     Serial.println(" hPa");
@@ -600,7 +600,7 @@ void printValues() {
     //Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
     //Serial.println(" m");
 
-    Serial.print("Relative Humidity (BME280) = ");
+    Serial.print("Relative Humidity (BME280): ");
     Serial.print(bme.readHumidity());
     Serial.println(" %");
 

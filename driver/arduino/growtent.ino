@@ -1,8 +1,14 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//ENV-TMP (analog pin A0) //// TO ADD: //// WLSENS (eTape) (analog pins A2,A3)
-//(10' 22/4 cable) BME280 (i2c pins A4,A5) TSL2561 (i2c pins A4,A5) pH (analog
-//pH out (Po) pin A6, analog temp out (T1) pin A7, digital temp DS18B20 (T2) pin
-//10) float sensor (binary hi-lo) (digital read pin 2) DS18B20 (1-wire pin 12)
+//// CONNECTED SENSORS: ////
+//ENV-TMP (analog pin A0) 
+//// TO ADD: //// WLSENS (eTape) (analog pins A2,A3) (10' 22/4 cable) 
+//BME280 (i2c pins A4,A5) 
+//TSL2561 (i2c pins A4,A5) 
+//Sparky's pH (i2c pins A4,A5)
+//Sparky's EC (i2c pins A4,A5)
+//pH (analog pH out (Po) pin A6, analog temp out (T1) pin A7, digital temp DS18B20 (T2) pin 10) 
+//float sensor (binary hi-lo) (digital read pin 4)
+//DS18B20 (1-wire pin 12)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <Wire.h>
@@ -367,8 +373,8 @@ void loop() {
   calcpH(adc_result);
 
   // Read raw EC Data
-	int adcRaw = i2cADC.getData();
-	calcEc(adcRaw);
+  int adcRaw = i2cADC.getData();
+  calcEc(adcRaw);
 
   //Lets handle any commands here otherwise if we do prior to a fresh ADC reading
   //may end up calibrate to slightly older data (this really might not matter, handle as you will)
@@ -428,6 +434,7 @@ void loop() {
   Serial.print(" | ");
   Serial.println(adcRaw);
 
+
   /* Serial.println(); */
   temp = read_temp();       //call the ENV-TMP function “read_temp” and return the temperature in C°
   Serial.print("Water Temperature (ENV-TMP): ");
@@ -443,7 +450,9 @@ void loop() {
   Serial.print(" Reference: ");
   Serial.println(WLrefREAD);
 
+
   delay(100);
+
 
   pHanalog = analogRead(pHanalogPIN);
   Serial.print("pH Analog Raw Reading: ");
@@ -490,23 +499,7 @@ void loop() {
     }
   //else ghost device! Check your power requirements and cabling
   }
-
-  Serial.print("Air Temperature (BME280) = ");
-  Serial.print(bme.readTemperature());
-  Serial.println(" *C");
-
-  Serial.print("Air Pressure (BME280) = ");
-
-  Serial.print(bme.readPressure() / 100.0F);
-  Serial.println(" hPa");
-
-  //Serial.print("Approximate Altitude = ");
-  //Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-  //Serial.println(" m");
-
-  Serial.print("Relative Humidity (BME280) = ");
-  Serial.print(bme.readHumidity());
-  Serial.println(" %");
+  
 
   printValues();           //read & print bme280 data
   delay(delayTime);
@@ -566,6 +559,7 @@ void loop() {
     Serial.println("Water level (float): OKAY");
   }
 
+  Serial.println();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -641,6 +635,7 @@ void printTemperature2(DeviceAddress deviceAddress2)
   Serial.print(" *C ");
   Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // function to print a 1-wire device address
@@ -679,19 +674,19 @@ void calceCSlope ()
 {
   //RefVoltage * our deltaRawpH / 12bit steps *mV in V / OP-Amp gain / reference solution difference
   // TODO add reference solution difference
-	params_ec.eCStep = ((((I2CadcVRef*(float)(params_ec.eCLowCal - params_ec.eCHighCal)) / 4095) * 1000));
+  params_ec.eCStep = ((((I2CadcVRef*(float)(params_ec.eCLowCal - params_ec.eCHighCal)) / 4095) * 1000));
 }
 
 void calcEc(int raw)
 {
-	/* float temp, tempmv, tempgain, Rprobe; */
-	/* // tempmv = (float)i2cADC.calcMillivolts(raw); */
+  /* float temp, tempmv, tempgain, Rprobe; */
+  /* // tempmv = (float)i2cADC.calcMillivolts(raw); */
   /* //  tempmv =  ((raw / 4095)* I2CadcVRef); //MCP3221 is 12bit datasheet reports a full range of 4095 */
-  /* //	tempgain = (tempmv / (float)oscV) - 1.0; // what is our overall gain again so we can cal our probe leg portion */
+  /* // tempgain = (tempmv / (float)oscV) - 1.0; // what is our overall gain again so we can cal our probe leg portion */
   /* tempgain = (raw / (float)oscV); // modified from the above */
-	/* Rprobe = (Rgain / tempgain); // this is our actually Resistivity */
-	/* temp = ((1000000) * kCell) / Rprobe; // this is where we convert to uS inversing so removed neg exponant */
-	/* eC = temp / 1000.0; //convert to EC from uS */
+  /* Rprobe = (Rgain / tempgain); // this is our actually Resistivity */
+  /* temp = ((1000000) * kCell) / Rprobe; // this is where we convert to uS inversing so removed neg exponant */
+  /* eC = temp / 1000.0; //convert to EC from uS */
 
   float value;
   float SW_condK;

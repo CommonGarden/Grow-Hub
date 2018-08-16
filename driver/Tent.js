@@ -50,7 +50,8 @@ fs.readdir(path, (err, items)=> {
     path = path + items[1];
 
     relays_nano = new five.Board({
-        port: path
+        port: path,
+        repl: false,
     });
 
     // Assign relays to pins on the NANO
@@ -110,7 +111,8 @@ parseArduinoData();
 
 // Create a new board object
 const board = new five.Board({
-    io: new raspio()
+    io: new raspio(),
+    repl: false
 });
 
 // When board emits a 'ready' event run this start function.
@@ -208,7 +210,7 @@ board.on('ready', function start() {
                 outside_temperature = Number(data[0]).toFixed(2);
                 outside_humidity = Number(data[1]).toFixed(2);
                 outside_pressure = Number(data[2]).toFixed(2);
-                this.emit('outside_temerature', outside_temperature);
+                this.emit('outside_temperature', outside_temperature);
                 this.emit('outside_humidity', outside_humidity);
                 this.emit('outside_pressure', outside_pressure);
                 console.log('External temperature: ' + outside_temperature);
@@ -218,7 +220,7 @@ board.on('ready', function start() {
 
             if (water_level) this.emit('water_level', water_level);
             if (env_temp) this.emit('env_temp', env_temp);
-            if (water_temp) this.emit('water_temp', water_temp);
+            if (water_temp) this.emit('water_temperature', water_temp);
             if (water_temp_on_ph) this.emit('water_temp_on_ph', water_temp_on_ph);
 
             console.log("Water temperature: " + water_temp);

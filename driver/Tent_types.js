@@ -79,7 +79,7 @@ module.exports = {
             icon: 'wi wi-barometer',
         },
         {
-            type: 'dissolved_oxygen',
+            type: 'do',
             title: 'Dissolved Oxygen',
             icon: 'wi wi-raindrop',
         },

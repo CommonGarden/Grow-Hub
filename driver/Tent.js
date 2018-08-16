@@ -17,6 +17,9 @@ later.date.localTime();
 let temperature,
     currentHumidity,
     pressure,
+    outside_temperature,
+    outside_humidity,
+    outside_pressure,
     pH_reading,
     eC_reading,
     DO_reading,
@@ -191,18 +194,27 @@ board.on('ready', function start() {
 
             process.stdout.on('data', (data)=> {
                 data = data.toString().split(' ');
-                temperature = Number(data[0]).toFixed(2);
-                currentHumidity = Number(data[1]).toFixed(2);
-                pressure = Number(data[2]).toFixed(2);
-                this.temp_data();
-                this.hum_data();
-                this.pressure_data();
+                outside_temperature = Number(data[0]).toFixed(2);
+                outside_humidity = Number(data[1]).toFixed(2);
+                outside_pressure = Number(data[2]).toFixed(2);
+                this.emit('outside_temerature', outside_temperature);
+                this.emit('outside_humidity', outside_humidity);
+                this.emit('outside_pressure', outside_pressure);
+                console.log('External temperature: ' + outside_temperature);
+                console.log('External humidity: ' + outside_humidity);
+                console.log('External pressure: ' + outside_pressure);
             });
 
             if (water_level) this.emit('water_level', water_level);
             if (env_temp) this.emit('env_temp', env_temp);
             if (water_temp) this.emit('water_temp', water_temp);
             if (water_temp_on_ph) this.emit('water_temp_on_ph', water_temp_on_ph);
+
+            console.log("Water temperature: " + water_temp);
+            console.log("Water temperature: " + water_temp_on_ph);
+            console.log("Water level: " +  water_level);
+            console.log("Env temperature: " + env_temp);
+
 
             this.temp_data();
             this.hum_data();

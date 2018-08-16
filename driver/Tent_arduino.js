@@ -1,26 +1,67 @@
 /*
 
-Serial format:
+  Serial format:
 
-Water Temperature (ENV-TMP): 49.53
-Water Level: 280 Reference: 264
-pH Analog Raw Reading: 870.00
-pH Analog Mapped: 3.00
-pH Analog Temperature: 160.00
-Water Temperature (DS18B20 on pH): 24.50 *C 76.10
-Water Temperat⸮Locating devices...Found 1 on bus1, and: 1 on bus2.
-Parasite power on bus1 is: OFF
-Parasite power on bus2 is: OFF
-Found device 0 with address: 28FFA47F62160318
-Setting resolution to 9
-Resolution actually set to: 9
-Found device 0 with address: 283BD771040000BD
-Setting resolution to 9
-Resolution actually set to: 9
-pH: 6.66 | 2067
-EC: 3918.64 | 105
+  pH: -6.16 | 3071
+  EC: 206.53 | 43
+  Water Temperature (ENV-TMP): 31.83 *C
+  Water Level: 252 Reference: 264
+  pH Analog Raw Reading: 754.00
+  pH Analog Mapped: 4.00
+  pH Analog Temperature: 159.00
+  Water Temperature (DS18B20 on pH): 24.00 *C 75.20 *F
+  Water Temperature (pin-12 DS18B20): 23.50 *C 74.30 *F
+  Air Temperature (BME280): 25.26 *C
+  Air Pressure (BME280): 1013.86 hPa
+  Relative Humidity (BME280): 49.90 %
+  Ambient Light (TSL2561): 69.00 lux
+  Water level (float): OKAY
+
+  pH: -6.16 | 3071
+  EC: 203.42 | 42
+  Water Temperature (ENV-TMP): 31.83 *C
+  Water Level: 231 Reference: 228
+  pH Analog Raw Reading: 756.00
+  pH Analog Mapped: 4.00
+  pH Analog Temperature: 155.00
+  Water Temperature (DS18B20 on pH): 24.00 *C 75.20 *F
+  Water Temperature (pin-12 DS18B20): 23.50 *C 74.30 *F
+  Air Temperature (BME280): 25.27 *C
+  Air Pressure (BME280): 1013.82 hPa
+  Relative Humidity (BME280): 49.96 %
+  Ambient Light (TSL2561): 66.00 lux
+  Water level (float): LOW
 
 */
+
+
+// let data = `pH: -6.16 | 3071
+// EC: 206.53 | 43
+// Water Temperature (ENV-TMP): 31.83 *C
+// Water Level: 252 Reference: 264
+// pH Analog Raw Reading: 754.00
+// pH Analog Mapped: 4.00
+// pH Analog Temperature: 159.00
+// Water Temperature (DS18B20 on pH): 24.00 *C 75.20 *F
+// Water Temperature (pin-12 DS18B20): 23.50 *C 74.30 *F
+// Air Temperature (BME280): 25.26 *C
+// Air Pressure (BME280): 1013.86 hPa
+// Relative Humidity (BME280): 49.90 %
+// Ambient Light (TSL2561): 69.00 lux
+// Water level (float): OKAY`;
+
+// console.log(data);
+
+let temp,
+    humidity,
+    pressure,
+    lux,
+    water_level,
+    water_temp,
+    water_temp_on_ph,
+    env_temp,
+    ph,
+    ec;
 
 // Connects to Arduino nano over USB (serial) and parses repsonse.
 const serialport = require('serialport');
@@ -56,19 +97,41 @@ fs.readdir(path, function(err, items) {
   	        let regex = /\r\n\r\n/;
   	        if(string.join("").match(regex)) {
   	            let data = string.join("");
-  	            let tempRegEx = /Temperature:\s(.+)\*/;
-  	            let humRegEx = /Humidity:\s(.+)%/;
-                let pressureRegEx = /Pressure:\s(.+)\sh/;
-                let luxRegEx = /lux:\s(\d+\.?\d+)\s?\(?/;
+                let tempRegEx = /Temperature\s\(BME280\):\s(.+)\s\*/;
+                let humRegEx = /Humidity\s\(BME280\):\s(.+)%/;
+                let pressureRegEx = /Pressure\s\(BME280\):\s(.+)\sh/;
+                let luxRegEx = /Light\s\(TSL2561\):\s(\d+\.?\d+)\s?\(?/;
+                let waterTempRegEx = /Temperature\s\(pin-12\sDS18B20\):\s(.+)\s\*C/;
+                let waterTempOnPHRegEx = /DS18B20\son\spH\):\s(.+)\s\*C/;
+                let phRegEx = /pH:\s(.+)\s\|/;
+                let ecRegEx = /EC:\s(.+)\s\|/;
+                let envTempRegEx = /ENV-TMP\):\s(.+)\s\*C/;
+                let waterLevelRegEx = /Water\slevel\s\(float\):\s(.+)/;
+
                 try {
                     temp = data.match(tempRegEx)[1];
                     humidity = data.match(humRegEx)[1];
                     pressure = data.match(pressureRegEx)[1];
                     lux = data.match(luxRegEx)[1];
+                    water_temp = data.match(waterTempRegEx)[1];
+                    ph = data.match(phRegEx)[1];
+                    ec = data.match(ecRegEx)[1];
+                    water_temp_on_ph = data.match(waterTempOnPHRegEx)[1];
+                    env_temp = data.match(envTempRegEx)[1];
+                    water_level = data.match(waterLevelRegEx)[1];
                 } catch (err) {
                     // console.log(err)
                 }
-                console.log(temp, humidity, pressure, lux);
+                console.log(temp,
+                            humidity,
+                            pressure,
+                            lux,
+                            env_temp,
+                            water_temp,
+                            water_temp_on_ph,
+                            ph,
+                            ec,
+                            water_level);
                 string = [];
   	        }
         });

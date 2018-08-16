@@ -438,7 +438,8 @@ void loop() {
   /* Serial.println(); */
   temp = read_temp();       //call the ENV-TMP function “read_temp” and return the temperature in C°
   Serial.print("Water Temperature (ENV-TMP): ");
-  Serial.println(temp);     //print the temperature data
+  Serial.print(temp);     //print the temperature data
+  Serial.println(" *C ");
 
 
   /* Read eTape sensor */
@@ -617,7 +618,8 @@ void printTemperature1(DeviceAddress deviceAddress1)
   Serial.print("Water Temperature (DS18B20 on pH): ");
   Serial.print(tempC);
   Serial.print(" *C ");
-  Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
+  Serial.print(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
+  Serial.println(" *F ");
 }
 
 void printTemperature2(DeviceAddress deviceAddress2)
@@ -633,7 +635,8 @@ void printTemperature2(DeviceAddress deviceAddress2)
   Serial.print("Water Temperature (pin-12 DS18B20): ");
   Serial.print(tempC);
   Serial.print(" *C ");
-  Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
+  Serial.print(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
+  Serial.println(" *F ");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

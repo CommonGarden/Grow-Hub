@@ -228,6 +228,15 @@ setTimeout(()=> {
                     console.log('External pressure: ' + outside_pressure);
                 });
 
+                let lux_process =  spawn('python', ['python/tsl2561/test.py']);
+                lux_process.stdout.on('data', (data)=> {
+                    data = data.toString();
+                    let outside_lux = Number(data);
+                    this.emit('outside_lux', outside_lux);
+                    console.log('Outside lux: ' + outside_lux);
+
+                });
+
                 if (water_level) this.emit('water_level', water_level);
                 if (env_temp) {
                     let calibrated_value = env_temp - 18;

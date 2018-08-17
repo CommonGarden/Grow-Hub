@@ -69,6 +69,11 @@ module.exports = {
             icon: 'wi wi-day-sunny',
         },
         {
+            type: 'outside_lux',
+            title: 'External Lux',
+            icon: 'wi wi-day-sunny',
+        },
+        {
             type: 'ph',
             title: 'pH',
             icon: 'wi wi-raindrop',

@@ -160,8 +160,6 @@ setTimeout(()=> {
 
                 this.picture();
 
-                this.calibrate('env_temp', [[45, 25], [40, 20]]);
-
                 var interval = this.get('interval');
                 this.fire();
                 emit_data = setInterval(()=>{
@@ -231,10 +229,9 @@ setTimeout(()=> {
 
                 if (water_level) this.emit('water_level', water_level);
                 if (env_temp) {
-                    let calibrated_value = this.predict('env_temp', env_temp);
-                    console.log("env temperature: " + env_temp);
-                    console.log("calibrated env temperature: " + calibrated_value);
-
+                    let calibrated_value = env_temp - 18;
+                    console.log("Analog temperature: " + env_temp);
+                    console.log("Calibrated analog temperature: " + calibrated_value);
                     this.emit('env_temp', calibrated_value);
                 }
                 if (water_temp) this.emit('water_temperature', water_temp);

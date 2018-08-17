@@ -128,6 +128,7 @@ setTimeout(()=> {
                 humidifier: 'off',
                 light: 'off',
                 water_pump: 'off',
+                dosing_pump: 'off',
                 duration: 2000,
                 interval: 10000,
                 picture_interval: 100000,

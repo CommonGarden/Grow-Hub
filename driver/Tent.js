@@ -42,34 +42,41 @@ let temperature,
     relays,
     relays_nano;
 
-let path = '/dev/serial/by-path/';
 
-// Read the directory
-fs.readdir(path, (err, items)=> {
-    // We want the second arduino
-    path = path + items[1];
+setTimeout(()=> {
+    let path = '/dev/serial/by-path/';
 
-    relays_nano = new five.Board({
-        port: path,
-        repl: false,
-    });
+    // Read the directory
+    fs.readdir(path, (err, items)=> {
+        // We want the second arduino
+        path = path + items[1];
 
-    // Assign relays to pins on the NANO
-    // We don't run them off the pi becase they require 5V pins
-    relays_nano.on('ready', function start() {
-        relay1 = new five.Pin(6);
-        relay2 = new five.Pin(7);
-        relay3 = new five.Pin(8);
-        relay4 = new five.Pin(9);
+        relays_nano = new five.Board({
+            port: path,
+            repl: false,
+        });
 
-        relays = {
-            relay1,
-            relay2,
-            relay3,
-            relay4
-        };
-    });
-})
+        // Assign relays to pins on the NANO
+        // We don't run them off the pi becase they require 5V pins
+        relays_nano.on('ready', function start() {
+            relay1 = new five.Pin(6);
+            relay2 = new five.Pin(7);
+            relay3 = new five.Pin(8);
+            relay4 = new five.Pin(9);
+
+            relays = {
+                relay1,
+                relay2,
+                relay3,
+                relay4
+            };
+        });
+    })
+
+    console.log("RELAYS")
+    console.log(relays)
+}, 5000)
+
 
 // Kill the nano.js process if it is already running.
 // Otherwise USB sensor modules will not reconnect.

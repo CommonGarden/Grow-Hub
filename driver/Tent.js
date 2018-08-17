@@ -254,6 +254,14 @@ setTimeout(()=> {
                 this.ec_data();
             },
 
+            day: function () {
+                this.call('light_on');
+            },
+
+            night: function () {
+                this.call('light_off');
+            },
+
             water_circulation: function () {
                 this.water_pump_on();
                 let duration = Number(this.get('growfile').watering_duration);

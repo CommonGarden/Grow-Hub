@@ -174,7 +174,7 @@ setTimeout(()=> {
                     this.startGrow(growfile);
                 }, 5000);
 
-                this.on('corrections', (key, correction)=> {
+                this.on('correction', (key, correction)=> {
                     if (key === 'temerature') {
                         // Handle temperature control
                     }

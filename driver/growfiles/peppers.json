@@ -70,7 +70,7 @@
                     }
                 }
             },
-            "schedule": "after 6:00pm"
+            "schedule": "after 8:00am"
         },
         "night": {
             "targets": {
@@ -86,7 +86,7 @@
                     }
                 }
             },
-            "schedule": "after 10:00am"
+            "schedule": "after 7:00pm"
         },
         "water_circulation": {
             "schedule": "every 1 hour"

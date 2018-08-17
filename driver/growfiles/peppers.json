@@ -7,6 +7,7 @@
         "harvest": "Harvest the peppers."
     },
     "batch": "#1",
+    "watering_duration": 120000,
     "temperature_threshold": 50,
     "humidity_threshold": 100,
     "targets": {
@@ -86,6 +87,9 @@
                 }
             },
             "schedule": "after 10:00am"
+        },
+        "water_circulation": {
+            "schedule": "every 1 hour"
         }
     }
 }

@@ -7,7 +7,7 @@ const five = require('johnny-five');
 const later = require('later');
 const _ = require('underscore');
 const spawn = require('child_process').spawn;
-const growfile_example = require('./growfiles/simple.json');
+const growfile_example = require('./growfiles/peppers.json');
 const types = require('./Tent_types.js');
 const fs = require('fs');
 
@@ -127,6 +127,7 @@ setTimeout(()=> {
                 heater: 'off',
                 humidifier: 'off',
                 light: 'off',
+                water_pump: 'off',
                 duration: 2000,
                 interval: 10000,
                 picture_interval: 100000,
@@ -172,22 +173,28 @@ setTimeout(()=> {
                     this.startGrow(growfile);
                 }, 5000);
 
-                // this.on('correction', (key, correction)=> {
-                //     console.log(key, correction);
-                //     if (key === 'temerature') {
-                //         // Handle temperature control
-                //     }
+                this.on('correction', (key, correction)=> {
+                    if (key === 'temerature') {
+                        // Handle temperature control
+                    }
 
-                //     if (key === 'humidity') {
-                //         // Handle humidity control
-                //     }
-                // });
+                    if (key === 'humidity') {
+                        // Handle humidity control
+                        console.log('Humidity correction: ' + correction);
+                        let threshold = growfile.humidity_threshold;
+                        if (correction > threshold) {
+                            this.humidifier_on();
+                        } else if (correction < threshold) {
+                            this.humidifier_off();
+                        }
+                    }
+                });
 
-                this.emit('message', 'Running')
+                this.emit('message', 'Running');
             },
 
             reboot: function () {
-                spawn('reboot', ['now'])
+                spawn('reboot', ['now']);
             },
 
             stop: function () {
@@ -240,8 +247,16 @@ setTimeout(()=> {
                 this.ec_data();
             },
 
+            water_circulation: function () {
+                this.water_pump_on();
+                let duration = Number(this.get('growfile').watering_duration);
+                setTimeout(()=> {
+                    this.water_pump_off();
+                }, duration)
+            },
+
             picture: function () {
-                let takePic = spawn('raspistill', ['-o', 'image.jpg', '-q', '10'])
+                let takePic = spawn('raspistill', ['-o', 'image.jpg', '-q', '10']);
                 // wait for image to be saved, before reading it.
                 setTimeout(()=> {
                     fs.readFile('./image.jpg', (err, data) => {
@@ -318,6 +333,16 @@ setTimeout(()=> {
             fan_off: function () {
                 this.turn_off('fan');
                 this.set('fan', 'off');
+            },
+
+            water_pump_on: function () {
+                this.turn_on('water_pump');
+                this.set('water_pump', 'on');
+            },
+
+            water_pump_off: function () {
+                this.turn_off('water_pump');
+                this.set('water_pump', 'off');
             },
 
             relay1_on: function () {
@@ -410,7 +435,7 @@ setTimeout(()=> {
                 if (!_.isUndefined(light_data)) {
                     this.emit('lux', Number(light_data));
 
-                    console.log('Lux: ' + light_data)
+                    console.log('Lux: ' + light_data);
                 }
             },
 

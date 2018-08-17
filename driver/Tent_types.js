@@ -19,8 +19,8 @@ module.exports = {
             type: 'relay',
             state: 'off',
             number: 3,
-            title: 'Heater',
-            role: 'heater'
+            title: 'Water circulation',
+            role: 'water_pump'
         },
         {
             type: 'relay',

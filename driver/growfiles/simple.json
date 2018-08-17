@@ -1,40 +1,43 @@
 {
-  "name": "Green house",
-  "batch": "#1",
-  "lux_threshold": 10000,
-  "targets": {
-    "humidity": {
-      "min":15,
-      "max":85
+    "name": "Green house",
+    "batch": "#1",
+    "lux_threshold": 10000,
+    "targets": {
+        "humidity": {
+            "min":15,
+            "max":85
+        },
+        "temperature": {
+            "min": 5,
+            "max": 40
+        },
+        "water_temperature": {
+            "min": 5,
+            "max": 35
+        },
+        "co2": {
+            "min": 350,
+            "target": 500,
+            "max": 600
+        },
+        "ph": {
+            "min": 5.5,
+            "max": 7
+        },
+        "ec": {
+            "min": 200,
+            "max": 1500
+        }
     },
-    "temperature": {
-      "min": 5,
-      "max": 40
-    },
-    "water_temperature": {
-      "min": 5,
-      "max": 35
-    },
-    "co2": {
-      "min": 350,
-      "target": 500,
-      "max": 600
-    },
-    "ph": {
-      "min": 5.5,
-      "max": 7
-    },
-    "ec": {
-      "min": 200,
-      "max": 1500
+    "cycles": {
+        "light_on": {
+            "schedule": "after 6:00pm"
+        },
+        "light_off": {
+            "schedule": "after 10:00am"
+        },
+        "water_circulation": {
+            "schedule": "every 1 hour"
+        }
     }
-  },
-  "cycles": {
-    "light_on": {
-      "schedule": "after 6:00pm"
-    },
-    "light_off": {
-      "schedule": "after 10:00am"
-    }
-  }
 }

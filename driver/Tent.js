@@ -160,7 +160,7 @@ setTimeout(()=> {
 
                 this.picture();
 
-                this.calibrate('env_temp', [40, 25]);
+                this.calibrate('env_temp', [[45, 25], [40, 20]]);
 
                 var interval = this.get('interval');
                 this.fire();
@@ -175,7 +175,7 @@ setTimeout(()=> {
                     this.startGrow(growfile);
                 }, 5000);
 
-                this.on('correction', (key, correction)=> {
+                this.on('corrections', (key, correction)=> {
                     if (key === 'temerature') {
                         // Handle temperature control
                     }
@@ -232,10 +232,10 @@ setTimeout(()=> {
                 if (water_level) this.emit('water_level', water_level);
                 if (env_temp) {
                     let calibrated_value = this.predict('env_temp', env_temp);
-                    console.log("Env temperature: " + env_temp);
-                    console.log("Calibrated Env temperature: " + calibrated_value);
+                    console.log("env temperature: " + env_temp);
+                    console.log("calibrated env temperature: " + calibrated_value);
 
-                    this.emit('env_temp', env_temp);
+                    this.emit('env_temp', calibrated_value);
                 }
                 if (water_temp) this.emit('water_temperature', water_temp);
                 if (water_temp_on_ph) this.emit('water_temp_on_ph', water_temp_on_ph);
@@ -353,42 +353,44 @@ setTimeout(()=> {
             },
 
             relay1_on: function () {
-                this.call('on', 'relay1');
+                this.call('On', 'relay1');
             },
 
             relay1_off: function () {
-                this.call('off', 'relay1');
+                this.call('Off', 'relay1');
             },
 
             relay2_on: function () {
-                this.call('on', 'relay2');
+                this.call('On', 'relay2');
             },
 
             relay2_off: function () {
-                this.call('off', 'relay2');
+                this.call('Off', 'relay2');
             },
 
             relay3_on: function () {
-                this.call('on', 'relay3');
+                this.call('On', 'relay3');
             },
 
             relay3_off: function () {
-                this.call('off', 'relay3');
+                this.call('Off', 'relay3');
             },
 
             relay4_on: function () {
-                this.call('on', 'relay4');
+                this.call('On', 'relay4');
             },
 
             relay4_off: function () {
-                this.call('off', 'relay4');
+                this.call('Off', 'relay4');
             },
 
-            on: function(relay) {
+            On: function(relay) {
+                console.log(relay);
                 relays[relay].low();
             },
 
-            off: function(relay) {
+            Off: function(relay) {
+                console.log(relay);
                 relays[relay].high();
             },
 

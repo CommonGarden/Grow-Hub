@@ -160,6 +160,8 @@ setTimeout(()=> {
 
                 this.picture();
 
+                this.calibrate('env_temp', [40, 25]);
+
                 var interval = this.get('interval');
                 this.fire();
                 emit_data = setInterval(()=>{
@@ -200,6 +202,7 @@ setTimeout(()=> {
             stop: function () {
                 this.emit('message', 'Stopped');
                 clearInterval(emit_data);
+                clearInterval(picture_interval);
                 this.removeAllListeners();
                 this.removeTargets();
             },
@@ -227,15 +230,19 @@ setTimeout(()=> {
                 });
 
                 if (water_level) this.emit('water_level', water_level);
-                if (env_temp) this.emit('env_temp', env_temp);
+                if (env_temp) {
+                    let calibrated_value = this.predict('env_temp', env_temp);
+                    console.log("Env temperature: " + env_temp);
+                    console.log("Calibrated Env temperature: " + calibrated_value);
+
+                    this.emit('env_temp', env_temp);
+                }
                 if (water_temp) this.emit('water_temperature', water_temp);
                 if (water_temp_on_ph) this.emit('water_temp_on_ph', water_temp_on_ph);
 
                 console.log("Water temperature: " + water_temp);
                 console.log("Water temperature: " + water_temp_on_ph);
                 console.log("Water level: " +  water_level);
-                console.log("Env temperature: " + env_temp);
-
 
                 this.temp_data();
                 this.hum_data();
@@ -252,7 +259,7 @@ setTimeout(()=> {
                 let duration = Number(this.get('growfile').watering_duration);
                 setTimeout(()=> {
                     this.water_pump_off();
-                }, duration)
+                }, duration);
             },
 
             picture: function () {

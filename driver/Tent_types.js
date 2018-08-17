@@ -5,30 +5,30 @@ module.exports = {
             type: 'relay',
             state: 'off',
             number: 1,
-            title: 'Fan',
-            role: 'fan'
+            title: 'Lights',
+            role: 'light'
         },
         {
             type: 'relay',
             state: 'off',
             number: 2,
-            title: 'Humidifier',
-            role: 'humidifier'
-        },
-        {
-            type: 'relay',
-            state: 'off',
-            number: 3,
             title: 'Water circulation',
             role: 'water_pump'
         },
         {
             type: 'relay',
             state: 'off',
+            number: 3,
+            title: 'Dosing pump',
+            role: 'dosing_pump'
+        },
+        {
+            type: 'relay',
+            state: 'off',
             number: 4,
-            title: 'Light',
-            role: 'light'
-        }
+            title: 'Humidifier',
+            role: 'humidifier'
+        },
     ],
     sensors: [
         {
@@ -90,7 +90,19 @@ module.exports = {
         },
         {
             type: 'water_temperature',
-            title: 'Water temperature',
+            title: 'Water Temperature',
+            icon: 'wi wi-thermometer',
+            unit: 'wi wi-celsius',
+        },
+        {
+            type: 'env_temp',
+            title: 'Analog Water Temperature',
+            icon: 'wi wi-thermometer',
+            unit: 'wi wi-celsius',
+        },
+        {
+            type: 'water_temp_on_ph',
+            title: 'Water temperature (pH probe)',
             icon: 'wi wi-thermometer',
             unit: 'wi wi-celsius',
         },

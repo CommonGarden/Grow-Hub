@@ -242,10 +242,10 @@ setTimeout(()=> {
                     let calibrated_value = env_temp - 18;
                     console.log("Analog temperature: " + env_temp);
                     console.log("Calibrated analog temperature: " + calibrated_value);
-                    this.emit('env_temp', calibrated_value);
+                    this.emit('env_temp', Number(calibrated_value));
                 }
-                if (water_temp) this.emit('water_temperature', water_temp);
-                if (water_temp_on_ph) this.emit('water_temp_on_ph', water_temp_on_ph);
+                if (water_temp) this.emit('water_temperature', Number(water_temp));
+                if (water_temp_on_ph) this.emit('water_temp_on_ph', Number(water_temp_on_ph));
 
                 console.log("Water temperature: " + water_temp);
                 console.log("Water temperature: " + water_temp_on_ph);

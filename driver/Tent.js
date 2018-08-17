@@ -154,7 +154,7 @@ setTimeout(()=> {
                     if (ORP) orp_reading = ORP;
                 });
 
-                var picture_interval = this.get('picture_interval');
+                let picture_interval = this.get('picture_interval');
                 camera_interval = setInterval(()=> {
                     this.picture();
                 }, picture_interval);
@@ -201,7 +201,7 @@ setTimeout(()=> {
             stop: function () {
                 this.emit('message', 'Stopped');
                 clearInterval(emit_data);
-                clearInterval(picture_interval);
+                clearInterval(camera_interval);
                 this.removeAllListeners();
                 this.removeTargets();
             },
